@@ -7,7 +7,7 @@ xcuserdata/
 .DS_Store
 
 # linux-wallpaperengine sources and build (tools/build-lwe.sh clones and patches them)
-engine/
+/engine
 
 # compiled helper and Valve's Steamworks library (not redistributable here, see tools/wehelper/build-wehelper.sh)
 tools/wehelper/wehelper-mac
