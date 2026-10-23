@@ -1,0 +1,19 @@
+# builds
+app/build/
+build/
+*.dmg
+DerivedData/
+xcuserdata/
+.DS_Store
+
+# linux-wallpaperengine sources and build (tools/build-lwe.sh clones and patches them)
+engine/
+
+# compiled helper and Valve's Steamworks library (not redistributable here, see tools/wehelper/build-wehelper.sh)
+tools/wehelper/wehelper-mac
+tools/wehelper/wehelper.exe
+tools/wehelper/libsteam_api.dylib
+
+# render test output
+tests/
+graphify-out/

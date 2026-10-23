@@ -1,0 +1,2387 @@
+diff --git a/src/External/Catch2 b/src/External/Catch2
+--- a/src/External/Catch2
++++ b/src/External/Catch2
+@@ -1 +1 @@
+-Subproject commit b3fb4b9feafcd8d91c5cb510a4775143fdbef02f
++Subproject commit b3fb4b9feafcd8d91c5cb510a4775143fdbef02f-dirty
+diff --git a/src/External/SPIRV-Cross-WallpaperEngine b/src/External/SPIRV-Cross-WallpaperEngine
+--- a/src/External/SPIRV-Cross-WallpaperEngine
++++ b/src/External/SPIRV-Cross-WallpaperEngine
+@@ -1 +1 @@
+-Subproject commit ad4d02220b01c1800e5a4e6671d6d8ca8ab07783
++Subproject commit ad4d02220b01c1800e5a4e6671d6d8ca8ab07783-dirty
+diff --git a/src/External/argparse b/src/External/argparse
+--- a/src/External/argparse
++++ b/src/External/argparse
+@@ -1 +1 @@
+-Subproject commit d924b84eba1f0f0adf38b20b7b4829f6f65b6570
++Subproject commit d924b84eba1f0f0adf38b20b7b4829f6f65b6570-dirty
+diff --git a/src/External/glslang-WallpaperEngine b/src/External/glslang-WallpaperEngine
+--- a/src/External/glslang-WallpaperEngine
++++ b/src/External/glslang-WallpaperEngine
+@@ -1 +1 @@
+-Subproject commit b775500a153f5ceb0e4b6f366b79c4c57521bb62
++Subproject commit b775500a153f5ceb0e4b6f366b79c4c57521bb62-dirty
+diff --git a/src/External/json b/src/External/json
+--- a/src/External/json
++++ b/src/External/json
+@@ -1 +1 @@
+-Subproject commit 4424a0fcc1c7fa640b5c87d26776d99150dacd10
++Subproject commit 4424a0fcc1c7fa640b5c87d26776d99150dacd10-dirty
+diff --git a/src/External/stb b/src/External/stb
+--- a/src/External/stb
++++ b/src/External/stb
+@@ -1 +1 @@
+-Subproject commit f0569113c93ad095470c54bf34a17b36646bbbb5
++Subproject commit f0569113c93ad095470c54bf34a17b36646bbbb5-dirty
+diff --git a/src/Steam/FileSystem/FileSystem.cpp b/src/Steam/FileSystem/FileSystem.cpp
+index 61dd5be..31653e3 100644
+--- a/src/Steam/FileSystem/FileSystem.cpp
++++ b/src/Steam/FileSystem/FileSystem.cpp
+@@ -66,4 +66,4 @@ std::filesystem::path Steam::FileSystem::appDirectory (const std::string& appDir
+     }
+ 
+     sLog.exception ("Cannot find directory for steam app ", appDirectory, ": ", path);
+-}
+\ No newline at end of file
++}
+diff --git a/src/Steam/FileSystem/FileSystem.h b/src/Steam/FileSystem/FileSystem.h
+index daf7e74..6b59426 100644
+--- a/src/Steam/FileSystem/FileSystem.h
++++ b/src/Steam/FileSystem/FileSystem.h
+@@ -6,4 +6,4 @@
+ namespace Steam::FileSystem {
+ std::filesystem::path workshopDirectory (int appID, const std::string& contentID);
+ std::filesystem::path appDirectory (const std::string& appDirectory, const std::string& path);
+-} // namespace Steam::FileSystem
+\ No newline at end of file
++} // namespace Steam::FileSystem
+diff --git a/src/WallpaperEngine/Application/ApplicationContext.cpp b/src/WallpaperEngine/Application/ApplicationContext.cpp
+index 510ec95..74af871 100644
+--- a/src/WallpaperEngine/Application/ApplicationContext.cpp
++++ b/src/WallpaperEngine/Application/ApplicationContext.cpp
+@@ -664,7 +664,7 @@ void ApplicationContext::loadSettingsFromArgv () {
+ 
+ 	this->settings.audio.volume = std::max (0, std::min (this->settings.audio.volume, 128));
+ 	this->settings.screenshot.delay
+-	    = std::max<uint32_t> (0, std::min<uint32_t> (this->settings.screenshot.delay, 5));
++	    = std::max<uint32_t> (0, std::min<uint32_t> (this->settings.screenshot.delay, 600));
+ 
+ 	// use std::cout on this in case logging is disabled, this way it's easy to look at what is running
+ 	std::stringbuf buffer;
+diff --git a/src/WallpaperEngine/Application/ApplicationState.h b/src/WallpaperEngine/Application/ApplicationState.h
+index 719e725..33c3b28 100644
+--- a/src/WallpaperEngine/Application/ApplicationState.h
++++ b/src/WallpaperEngine/Application/ApplicationState.h
+@@ -21,4 +21,4 @@ public:
+ 	bool enabled;
+     } mouse {};
+ };
+-} // namespace WallpaperEngine::Application
+\ No newline at end of file
++} // namespace WallpaperEngine::Application
+diff --git a/src/WallpaperEngine/Application/WallpaperApplication.cpp b/src/WallpaperEngine/Application/WallpaperApplication.cpp
+index c9107af..4b7e6fc 100644
+--- a/src/WallpaperEngine/Application/WallpaperApplication.cpp
++++ b/src/WallpaperEngine/Application/WallpaperApplication.cpp
+@@ -666,6 +666,13 @@ void WallpaperApplication::takeScreenshot (const std::filesystem::path& filename
+ void WallpaperApplication::setupOutput () {
+     const char* XDG_SESSION_TYPE = getenv ("XDG_SESSION_TYPE");
+ 
++#ifdef __APPLE__
++    // macOS has no XDG session: only the GLFW window drivers apply, they ignore the session name
++    if (!XDG_SESSION_TYPE) {
++	XDG_SESSION_TYPE = "macos";
++    }
++#endif
++
+     if (!XDG_SESSION_TYPE) {
+ 	sLog.exception (
+ 	    "Cannot read environment variable XDG_SESSION_TYPE, window server detection failed. Please ensure proper "
+@@ -997,4 +1004,4 @@ void WallpaperApplication::setDestinationFramebuffer (GLuint framebuffer) {
+     };
+ }
+ 
+-GLuint WallpaperApplication::getDestinationFramebuffer () const { return this->m_destinationFramebuffer; }
+\ No newline at end of file
++GLuint WallpaperApplication::getDestinationFramebuffer () const { return this->m_destinationFramebuffer; }
+diff --git a/src/WallpaperEngine/Assets/AssetLoadException.h b/src/WallpaperEngine/Assets/AssetLoadException.h
+index 9ec7f3d..16c5f06 100644
+--- a/src/WallpaperEngine/Assets/AssetLoadException.h
++++ b/src/WallpaperEngine/Assets/AssetLoadException.h
+@@ -8,4 +8,4 @@ public:
+     using std::filesystem::filesystem_error::filesystem_error;
+     explicit AssetLoadException (const std::filesystem::filesystem_error& filesystem_error) noexcept;
+ };
+-} // namespace WallpaperEngine::Assets
+\ No newline at end of file
++} // namespace WallpaperEngine::Assets
+diff --git a/src/WallpaperEngine/Assets/AssetLocator.cpp b/src/WallpaperEngine/Assets/AssetLocator.cpp
+index 8d092d2..568676b 100644
+--- a/src/WallpaperEngine/Assets/AssetLocator.cpp
++++ b/src/WallpaperEngine/Assets/AssetLocator.cpp
+@@ -93,4 +93,4 @@ std::filesystem::path AssetLocator::physicalPath (const std::filesystem::path& p
+     } catch (std::filesystem::filesystem_error& base) {
+ 	throw AssetLoadException (base);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Assets/AssetLocator.h b/src/WallpaperEngine/Assets/AssetLocator.h
+index 3583b79..4aef1b2 100644
+--- a/src/WallpaperEngine/Assets/AssetLocator.h
++++ b/src/WallpaperEngine/Assets/AssetLocator.h
+@@ -24,4 +24,4 @@ private:
+ };
+ 
+ using AssetLocatorUniquePtr = std::unique_ptr<AssetLocator>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Audio/AudioContext.cpp b/src/WallpaperEngine/Audio/AudioContext.cpp
+index 2fec959..1d11641 100644
+--- a/src/WallpaperEngine/Audio/AudioContext.cpp
++++ b/src/WallpaperEngine/Audio/AudioContext.cpp
+@@ -20,4 +20,4 @@ Application::ApplicationContext& AudioContext::getApplicationContext () const {
+ Drivers::Recorders::PlaybackRecorder& AudioContext::getRecorder () const { return this->m_driver.getRecorder (); }
+ 
+ Drivers::AudioDriver& AudioContext::getDriver () const { return this->m_driver; }
+-} // namespace WallpaperEngine::Audio
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio
+diff --git a/src/WallpaperEngine/Audio/AudioContext.h b/src/WallpaperEngine/Audio/AudioContext.h
+index b433929..171c251 100644
+--- a/src/WallpaperEngine/Audio/AudioContext.h
++++ b/src/WallpaperEngine/Audio/AudioContext.h
+@@ -71,4 +71,4 @@ namespace Audio {
+ 	Drivers::AudioDriver& m_driver;
+     };
+ } // namespace Audio
+-} // namespace WallpaperEngine
+\ No newline at end of file
++} // namespace WallpaperEngine
+diff --git a/src/WallpaperEngine/Audio/AudioStream.cpp b/src/WallpaperEngine/Audio/AudioStream.cpp
+index 2df7b59..5b3c723 100644
+--- a/src/WallpaperEngine/Audio/AudioStream.cpp
++++ b/src/WallpaperEngine/Audio/AudioStream.cpp
+@@ -621,4 +621,4 @@ int AudioStream::decodeFrame (uint8_t* audioBuffer, const int bufferSize) {
+     return 0;
+ }
+ 
+-AudioContext& AudioStream::getAudioContext () const { return this->m_audioContext; }
+\ No newline at end of file
++AudioContext& AudioStream::getAudioContext () const { return this->m_audioContext; }
+diff --git a/src/WallpaperEngine/Audio/Drivers/AudioDriver.h b/src/WallpaperEngine/Audio/Drivers/AudioDriver.h
+index 8f3a0bb..bdc1e84 100644
+--- a/src/WallpaperEngine/Audio/Drivers/AudioDriver.h
++++ b/src/WallpaperEngine/Audio/Drivers/AudioDriver.h
+@@ -87,4 +87,4 @@ namespace Audio {
+ 	};
+     } // namespace Drivers
+ } // namespace Audio
+-} // namespace WallpaperEngine
+\ No newline at end of file
++} // namespace WallpaperEngine
+diff --git a/src/WallpaperEngine/Audio/Drivers/Detectors/AudioPlayingDetector.cpp b/src/WallpaperEngine/Audio/Drivers/Detectors/AudioPlayingDetector.cpp
+index adf60bb..c5bd27f 100644
+--- a/src/WallpaperEngine/Audio/Drivers/Detectors/AudioPlayingDetector.cpp
++++ b/src/WallpaperEngine/Audio/Drivers/Detectors/AudioPlayingDetector.cpp
+@@ -20,4 +20,4 @@ void AudioPlayingDetector::setIsPlaying (const bool newState) { this->m_isPlayin
+ 
+ void AudioPlayingDetector::update () { }
+ 
+-} // namespace WallpaperEngine::Audio::Drivers::Detectors
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio::Drivers::Detectors
+diff --git a/src/WallpaperEngine/Audio/Drivers/Detectors/PulseAudioPlayingDetector.cpp b/src/WallpaperEngine/Audio/Drivers/Detectors/PulseAudioPlayingDetector.cpp
+index 3d32b18..1d7f688 100644
+--- a/src/WallpaperEngine/Audio/Drivers/Detectors/PulseAudioPlayingDetector.cpp
++++ b/src/WallpaperEngine/Audio/Drivers/Detectors/PulseAudioPlayingDetector.cpp
+@@ -81,4 +81,4 @@ void PulseAudioPlayingDetector::update () {
+ 
+     pa_operation_unref (op);
+ }
+-} // namespace WallpaperEngine::Audio::Drivers::Detectors
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio::Drivers::Detectors
+diff --git a/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.cpp b/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.cpp
+index 1f39d22..f68a068 100644
+--- a/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.cpp
++++ b/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.cpp
+@@ -3,4 +3,4 @@
+ namespace WallpaperEngine::Audio::Drivers::Recorders {
+ void PlaybackRecorder::update () { }
+ 
+-} // namespace WallpaperEngine::Audio::Drivers::Recorders
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio::Drivers::Recorders
+diff --git a/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.h b/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.h
+index d46b83e..38b13bd 100644
+--- a/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.h
++++ b/src/WallpaperEngine/Audio/Drivers/Recorders/PlaybackRecorder.h
+@@ -11,4 +11,4 @@ public:
+     float audio32[32] = { 0 };
+     float audio64[64] = { 0 };
+ };
+-} // namespace WallpaperEngine::Audio::Drivers::Recorders
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio::Drivers::Recorders
+diff --git a/src/WallpaperEngine/Audio/Drivers/Recorders/PulseAudioPlaybackRecorder.cpp b/src/WallpaperEngine/Audio/Drivers/Recorders/PulseAudioPlaybackRecorder.cpp
+index 5831d4a..7e471a2 100644
+--- a/src/WallpaperEngine/Audio/Drivers/Recorders/PulseAudioPlaybackRecorder.cpp
++++ b/src/WallpaperEngine/Audio/Drivers/Recorders/PulseAudioPlaybackRecorder.cpp
+@@ -263,4 +263,4 @@ void PulseAudioPlaybackRecorder::update () {
+     }
+ }
+ 
+-} // namespace WallpaperEngine::Audio::Drivers::Recorders
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio::Drivers::Recorders
+diff --git a/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.cpp b/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.cpp
+index 297a606..f3f3b21 100644
+--- a/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.cpp
++++ b/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.cpp
+@@ -161,4 +161,4 @@ int SDLAudioDriver::getChannels () const { return this->m_audioSpec.channels; }
+ 
+ const SDL_AudioSpec& SDLAudioDriver::getSpec () const { return this->m_audioSpec; }
+ 
+-SDL_mutex* SDLAudioDriver::getStreamMutex () const { return this->m_streamListMutex; }
+\ No newline at end of file
++SDL_mutex* SDLAudioDriver::getStreamMutex () const { return this->m_streamListMutex; }
+diff --git a/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.h b/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.h
+index b063188..7822656 100644
+--- a/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.h
++++ b/src/WallpaperEngine/Audio/Drivers/SDLAudioDriver.h
+@@ -68,4 +68,4 @@ private:
+     /** All the playable steams */
+     std::map<int, SDLAudioBuffer*> m_streams {};
+ };
+-} // namespace WallpaperEngine::Audio::Drivers
+\ No newline at end of file
++} // namespace WallpaperEngine::Audio::Drivers
+diff --git a/src/WallpaperEngine/Data/Assets/Package.h b/src/WallpaperEngine/Data/Assets/Package.h
+index ffcffd7..dde0514 100644
+--- a/src/WallpaperEngine/Data/Assets/Package.h
++++ b/src/WallpaperEngine/Data/Assets/Package.h
+@@ -20,4 +20,4 @@ struct Package {
+     FileEntryList files;
+     uint32_t baseOffset;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Assets/Texture.h b/src/WallpaperEngine/Data/Assets/Texture.h
+index 1e81275..9a034d4 100644
+--- a/src/WallpaperEngine/Data/Assets/Texture.h
++++ b/src/WallpaperEngine/Data/Assets/Texture.h
+@@ -175,4 +175,4 @@ struct Texture {
+ 
+     [[nodiscard]] bool hasSpritesheet () const { return spritesheetFrames > 0; }
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Assets/Types.h b/src/WallpaperEngine/Data/Assets/Types.h
+index e9e6d73..ca78ac1 100644
+--- a/src/WallpaperEngine/Data/Assets/Types.h
++++ b/src/WallpaperEngine/Data/Assets/Types.h
+@@ -17,4 +17,4 @@ using FileEntryUniquePtr = std::unique_ptr<FileEntry>;
+ using PackageUniquePtr = std::unique_ptr<Package>;
+ using MipmapList = std::vector<MipmapSharedPtr>;
+ using FileEntryList = std::vector<FileEntryUniquePtr>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Builders/ColorBuilder.cpp b/src/WallpaperEngine/Data/Builders/ColorBuilder.cpp
+index e13a2d5..de6a518 100644
+--- a/src/WallpaperEngine/Data/Builders/ColorBuilder.cpp
++++ b/src/WallpaperEngine/Data/Builders/ColorBuilder.cpp
+@@ -66,4 +66,4 @@ WallpaperEngine::Data::Builders::ColorBuilder::parse (const std::string& value,
+ 	vectorSize == 3 ? glm::vec4 (VectorBuilder::parse<glm::vec3> (copy), alpha)
+ 			: VectorBuilder::parse<glm::vec4> (copy)
+     );
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Builders/ColorBuilder.h b/src/WallpaperEngine/Data/Builders/ColorBuilder.h
+index d07b348..81d8fb3 100644
+--- a/src/WallpaperEngine/Data/Builders/ColorBuilder.h
++++ b/src/WallpaperEngine/Data/Builders/ColorBuilder.h
+@@ -19,4 +19,4 @@ public:
+ 
+     static WallpaperEngine::Data::Model::Color parse (const std::string& value, float alpha = 1.0f);
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Builders/UserSettingBuilder.h b/src/WallpaperEngine/Data/Builders/UserSettingBuilder.h
+index ac46078..69168e8 100644
+--- a/src/WallpaperEngine/Data/Builders/UserSettingBuilder.h
++++ b/src/WallpaperEngine/Data/Builders/UserSettingBuilder.h
+@@ -17,4 +17,4 @@ public:
+ 	});
+     }
+ };
+-} // namespace WallpaperEngine::Data::Builders
+\ No newline at end of file
++} // namespace WallpaperEngine::Data::Builders
+diff --git a/src/WallpaperEngine/Data/Dumpers/StringPrinter.cpp b/src/WallpaperEngine/Data/Dumpers/StringPrinter.cpp
+index 20804df..b9f9a40 100644
+--- a/src/WallpaperEngine/Data/Dumpers/StringPrinter.cpp
++++ b/src/WallpaperEngine/Data/Dumpers/StringPrinter.cpp
+@@ -393,4 +393,4 @@ void StringPrinter::increaseIndentation () { this->m_level++; }
+ 
+ void StringPrinter::decreaseIndentation () { this->m_level--; }
+ 
+-std::string StringPrinter::str () const { return this->m_buffer.str (); }
+\ No newline at end of file
++std::string StringPrinter::str () const { return this->m_buffer.str (); }
+diff --git a/src/WallpaperEngine/Data/Model/Color.h b/src/WallpaperEngine/Data/Model/Color.h
+index 060fc0f..f2cce03 100644
+--- a/src/WallpaperEngine/Data/Model/Color.h
++++ b/src/WallpaperEngine/Data/Model/Color.h
+@@ -18,4 +18,4 @@ struct Color : private glm::vec4 {
+     using glm::vec4::g;
+     using glm::vec4::r;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Model/DynamicValue.cpp b/src/WallpaperEngine/Data/Model/DynamicValue.cpp
+index d41028f..d9048bb 100644
+--- a/src/WallpaperEngine/Data/Model/DynamicValue.cpp
++++ b/src/WallpaperEngine/Data/Model/DynamicValue.cpp
+@@ -5,6 +5,10 @@
+ #include "WallpaperEngine/Logging/Log.h"
+ #include "WallpaperEngine/Scripting/ScriptEngine.h"
+ 
++#include <algorithm>
++#include <cmath>
++#include <set>
++
+ using namespace WallpaperEngine::Data::Model;
+ 
+ DynamicValue::DynamicValue (const DynamicValue& other) {
+@@ -37,15 +41,123 @@ DynamicValue::DynamicValue (const Model::Color& value) {
+     this->DynamicValue::update (value, UpdateSource::Initialization);
+ }
+ 
++namespace {
++std::set<DynamicValue*>& animatedValues () {
++    static std::set<DynamicValue*> values;
++    return values;
++}
++
++float evaluateCurve (const std::vector<KeyframeAnimation::Keyframe>& keys, float frame) {
++    if (keys.empty ()) {
++	return 0.0f;
++    }
++
++    if (frame <= keys.front ().frame) {
++	return keys.front ().value;
++    }
++
++    if (frame >= keys.back ().frame) {
++	return keys.back ().value;
++    }
++
++    const auto next = std::upper_bound (
++	keys.begin (), keys.end (), frame,
++	[] (float f, const KeyframeAnimation::Keyframe& key) { return f < key.frame; }
++    );
++    const auto& a = *std::prev (next);
++    const auto& b = *next;
++    const float span = b.frame - a.frame;
++
++    if (span <= 0.0f) {
++	return b.value;
++    }
++
++    if (!a.frontEnabled && !b.backEnabled) {
++	return glm::mix (a.value, b.value, (frame - a.frame) / span);
++    }
++
++    // cubic bezier through the tangent handles; handle x is relative to a third of the segment
++    const glm::vec2 p0 { a.frame, a.value };
++    const glm::vec2 p3 { b.frame, b.value };
++    const glm::vec2 p1 = a.frontEnabled ? p0 + glm::vec2 (a.front.x * span / 3.0f, a.front.y)
++					: p0 + (p3 - p0) / 3.0f;
++    const glm::vec2 p2 = b.backEnabled ? p3 + glm::vec2 (b.back.x * span / 3.0f, b.back.y)
++				       : p3 - (p3 - p0) / 3.0f;
++    const auto bezier = [&] (float t) {
++	const float u = 1.0f - t;
++	return u * u * u * p0 + 3.0f * u * u * t * p1 + 3.0f * u * t * t * p2 + t * t * t * p3;
++    };
++
++    // solve x(t) = frame by bisection, x is monotonic for sane handles
++    float low = 0.0f, high = 1.0f;
++    for (int i = 0; i < 24; i++) {
++	const float mid = (low + high) / 2.0f;
++	(bezier (mid).x < frame ? low : high) = mid;
++    }
++
++    return bezier ((low + high) / 2.0f).y;
++}
++}
++
+ DynamicValue::~DynamicValue () {
+     // TODO: PROPERLY FIX THESE
+     if (this->m_aliveFlag) {
+ 	*this->m_aliveFlag = false;
+     }
++    animatedValues ().erase (this);
+     this->disconnect ();
+     this->m_listeners.clear ();
+ }
+ 
++void DynamicValue::setAnimation (KeyframeAnimation animation) {
++    if (animation.channels.empty ()) {
++	return;
++    }
++
++    this->m_animationBase = this->m_vec4;
++    this->m_animation = std::move (animation);
++    animatedValues ().insert (this);
++}
++
++void DynamicValue::animateAll (float time) {
++    for (auto* value : animatedValues ()) {
++	value->animate (time);
++    }
++}
++
++void DynamicValue::animate (float time) {
++    const auto& animation = *this->m_animation;
++    float frame = time * animation.fps;
++
++    if (animation.length > 0.0f) {
++	switch (animation.mode) {
++	    case KeyframeAnimation::Single: frame = std::min (frame, animation.length); break;
++	    case KeyframeAnimation::Mirror: {
++		const float cycle = std::fmod (frame, animation.length * 2.0f);
++		frame = cycle > animation.length ? animation.length * 2.0f - cycle : cycle;
++		break;
++	    }
++	    default: frame = std::fmod (frame, animation.length); break;
++	}
++    }
++
++    glm::vec4 result = {};
++    for (size_t i = 0; i < animation.channels.size () && i < 4; i++) {
++	result[i] = evaluateCurve (animation.channels[i], frame);
++    }
++
++    if (animation.relative) {
++	result += this->m_animationBase;
++    }
++
++    switch (animation.channels.size ()) {
++	case 1: this->update (result.x, UpdateSource::Script); break;
++	case 2: this->update (glm::vec2 (result), UpdateSource::Script); break;
++	case 3: this->update (glm::vec3 (result), UpdateSource::Script); break;
++	default: this->update (result, UpdateSource::Script); break;
++    }
++}
++
+ const glm::vec4& DynamicValue::getVec4 () const { return this->m_vec4; }
+ 
+ const glm::vec3& DynamicValue::getVec3 () const { return this->m_vec3; }
+diff --git a/src/WallpaperEngine/Data/Model/DynamicValue.h b/src/WallpaperEngine/Data/Model/DynamicValue.h
+index 4843dca..4c17326 100644
+--- a/src/WallpaperEngine/Data/Model/DynamicValue.h
++++ b/src/WallpaperEngine/Data/Model/DynamicValue.h
+@@ -10,6 +10,7 @@
+ #include <memory>
+ #include <optional>
+ #include <string>
++#include <vector>
+ 
+ namespace WallpaperEngine::Data::Model {
+ class DynamicValue;
+@@ -26,6 +27,33 @@ struct ScriptContext {
+     } object;
+ };
+ 
++/**
++ * Keyframe animation attached to a value ({"animation": {"c0": [...], "options": {...}}} in scene files),
++ * one curve per component
++ */
++struct KeyframeAnimation {
++    struct Keyframe {
++	float frame;
++	float value;
++	glm::vec2 back;
++	glm::vec2 front;
++	bool backEnabled;
++	bool frontEnabled;
++    };
++
++    enum Mode {
++	Loop = 0,
++	Mirror = 1,
++	Single = 2,
++    };
++
++    float fps = 30.0f;
++    float length = 0.0f;
++    Mode mode = Loop;
++    bool relative = false;
++    std::vector<std::vector<Keyframe>> channels;
++};
++
+ /**
+  * Class that represents different types of dynamic values
+  */
+@@ -136,8 +164,17 @@ public:
+      * Updates the script properties associated with this dynamic value
+      */
+     void setProperties (std::map<std::string, UserSettingUniquePtr> properties);
++    /**
++     * Drives this value from the given keyframe animation (see animateAll)
++     */
++    void setAnimation (KeyframeAnimation animation);
++    /**
++     * Advances every keyframe-animated value to the given time (in seconds)
++     */
++    static void animateAll (float time);
+ 
+ private:
++    void animate (float time);
+     /**
+      * Notifies any listeners that the value has changed
+      */
+@@ -157,6 +194,8 @@ private:
+     std::string m_string;
+     UnderlyingType m_type = Null;
+     std::optional<ConditionInfo> m_condition = std::nullopt;
++    std::optional<KeyframeAnimation> m_animation = std::nullopt;
++    glm::vec4 m_animationBase = {};
+     /** All the properties this script takes in */
+     std::map<std::string, UserSettingUniquePtr> m_properties;
+ };
+diff --git a/src/WallpaperEngine/Data/Model/Effect.h b/src/WallpaperEngine/Data/Model/Effect.h
+index 17c60ed..b6dc472 100644
+--- a/src/WallpaperEngine/Data/Model/Effect.h
++++ b/src/WallpaperEngine/Data/Model/Effect.h
+@@ -44,4 +44,4 @@ struct Effect {
+     /** The fbos declared by this effect */
+     std::vector<FBOUniquePtr> fbos;
+ };
+-} // namespace WallpaperEngine::Data::Model
+\ No newline at end of file
++} // namespace WallpaperEngine::Data::Model
+diff --git a/src/WallpaperEngine/Data/Model/Material.h b/src/WallpaperEngine/Data/Model/Material.h
+index c871ade..cca32c9 100644
+--- a/src/WallpaperEngine/Data/Model/Material.h
++++ b/src/WallpaperEngine/Data/Model/Material.h
+@@ -58,4 +58,4 @@ struct Material {
+     std::vector<MaterialPassUniquePtr> passes;
+ };
+ 
+-} // namespace WallpaperEngine::Data::Model
+\ No newline at end of file
++} // namespace WallpaperEngine::Data::Model
+diff --git a/src/WallpaperEngine/Data/Model/Model.h b/src/WallpaperEngine/Data/Model/Model.h
+index 357dfe7..922e81d 100644
+--- a/src/WallpaperEngine/Data/Model/Model.h
++++ b/src/WallpaperEngine/Data/Model/Model.h
+@@ -29,4 +29,4 @@ struct ModelStruct {
+     /** Model file for puppet */
+     std::optional<std::string> puppet;
+ };
+-} // namespace WallpaperEngine::Data::Model
+\ No newline at end of file
++} // namespace WallpaperEngine::Data::Model
+diff --git a/src/WallpaperEngine/Data/Model/Property.h b/src/WallpaperEngine/Data/Model/Property.h
+index bf51795..6820959 100644
+--- a/src/WallpaperEngine/Data/Model/Property.h
++++ b/src/WallpaperEngine/Data/Model/Property.h
+@@ -224,4 +224,4 @@ public:
+ private:
+     std::string m_value;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Model/Types.h b/src/WallpaperEngine/Data/Model/Types.h
+index 2d39d3f..68a1ae4 100644
+--- a/src/WallpaperEngine/Data/Model/Types.h
++++ b/src/WallpaperEngine/Data/Model/Types.h
+@@ -64,4 +64,4 @@ using ModelUniquePtr = std::unique_ptr<ModelStruct>;
+ using ObjectList = std::vector<ObjectUniquePtr>;
+ using ComboMap = std::map<std::string, int>;
+ using TextureMap = std::map<int, std::string>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Model/UserSetting.h b/src/WallpaperEngine/Data/Model/UserSetting.h
+index 5c618a6..fd09996 100644
+--- a/src/WallpaperEngine/Data/Model/UserSetting.h
++++ b/src/WallpaperEngine/Data/Model/UserSetting.h
+@@ -21,4 +21,4 @@ struct UserSetting {
+     std::optional<ConditionInfo> condition;
+     /** TODO: Value might come from a script and not have conditions, implement this later */
+ };
+-} // namespace WallpaperEngine::Data::Model
+\ No newline at end of file
++} // namespace WallpaperEngine::Data::Model
+diff --git a/src/WallpaperEngine/Data/Parsers/DynamicValueParser.cpp b/src/WallpaperEngine/Data/Parsers/DynamicValueParser.cpp
+index 777fa1a..ef413c5 100644
+--- a/src/WallpaperEngine/Data/Parsers/DynamicValueParser.cpp
++++ b/src/WallpaperEngine/Data/Parsers/DynamicValueParser.cpp
+@@ -3,8 +3,60 @@
+ #include "UserSettingParser.h"
+ #include "WallpaperEngine/Data/Model/DynamicValue.h"
+ 
++#include <algorithm>
++
+ using namespace WallpaperEngine::Data::Parsers;
+ 
++namespace {
++// {"c0": [{"frame", "value", "back": {"x", "y", "enabled"}, "front": {...}}], "c1": ..., "options": {...}}
++KeyframeAnimation parseAnimation (const json& data) {
++    KeyframeAnimation animation;
++
++    if (const auto optionsIt = data.find ("options"); optionsIt != data.end () && optionsIt->is_object ()) {
++	animation.fps = optionsIt->value ("fps", 30.0f);
++	animation.length = optionsIt->value ("length", 0.0f);
++
++	const std::string mode = optionsIt->value ("mode", std::string ("loop"));
++	animation.mode = mode == "single" ? KeyframeAnimation::Single
++	    : mode == "mirror"	       ? KeyframeAnimation::Mirror
++				       : KeyframeAnimation::Loop;
++    }
++
++    animation.relative = data.value ("relative", false);
++
++    const auto handle = [] (const json& key, const char* name, glm::vec2& out, bool& enabled) {
++	const auto it = key.find (name);
++	enabled = it != key.end () && it->is_object () && it->value ("enabled", false);
++	out = enabled ? glm::vec2 (it->value ("x", 0.0f), it->value ("y", 0.0f)) : glm::vec2 (0.0f);
++    };
++
++    for (int channel = 0; channel < 4; channel++) {
++	const auto curveIt = data.find ("c" + std::to_string (channel));
++
++	if (curveIt == data.end () || !curveIt->is_array ()) {
++	    break;
++	}
++
++	std::vector<KeyframeAnimation::Keyframe> keys;
++
++	for (const auto& key : *curveIt) {
++	    KeyframeAnimation::Keyframe keyframe {
++		.frame = key.value ("frame", 0.0f),
++		.value = key.value ("value", 0.0f),
++	    };
++	    handle (key, "back", keyframe.back, keyframe.backEnabled);
++	    handle (key, "front", keyframe.front, keyframe.frontEnabled);
++	    keys.push_back (keyframe);
++	}
++
++	std::ranges::sort (keys, {}, &KeyframeAnimation::Keyframe::frame);
++	animation.channels.push_back (std::move (keys));
++    }
++
++    return animation;
++}
++}
++
+ DynamicValueUniquePtr DynamicValueParser::parse (const json& data, const Properties& properties, bool expectColor) {
+     auto value = std::make_unique<DynamicValue> ();
+     auto valueIt = data;
+@@ -63,6 +115,12 @@ DynamicValueUniquePtr DynamicValueParser::parse (const json& data, const Propert
+ 	value->update (DynamicValue::UpdateSource::Initialization);
+     }
+ 
++    if (data.is_object ()) {
++	if (const auto animationIt = data.find ("animation"); animationIt != data.end () && animationIt->is_object ()) {
++	    value->setAnimation (parseAnimation (*animationIt));
++	}
++    }
++
+     if (scriptSource.has_value ()) {
+ 	std::map<std::string, UserSettingUniquePtr> scriptProps;
+ 
+@@ -77,4 +135,4 @@ DynamicValueUniquePtr DynamicValueParser::parse (const json& data, const Propert
+     }
+ 
+     return value;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/DynamicValueParser.h b/src/WallpaperEngine/Data/Parsers/DynamicValueParser.h
+index b8e71a9..3c7d460 100644
+--- a/src/WallpaperEngine/Data/Parsers/DynamicValueParser.h
++++ b/src/WallpaperEngine/Data/Parsers/DynamicValueParser.h
+@@ -11,4 +11,4 @@ class DynamicValueParser {
+ public:
+     static Model::DynamicValueUniquePtr parse (const json& data, const Properties& properties, bool expectColor);
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/EffectParser.cpp b/src/WallpaperEngine/Data/Parsers/EffectParser.cpp
+index d3d9450..e3c860a 100644
+--- a/src/WallpaperEngine/Data/Parsers/EffectParser.cpp
++++ b/src/WallpaperEngine/Data/Parsers/EffectParser.cpp
+@@ -115,4 +115,4 @@ std::vector<FBOUniquePtr> EffectParser::parseFBOs (const JSON& it) {
+     }
+ 
+     return result;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/ModelParser.cpp b/src/WallpaperEngine/Data/Parsers/ModelParser.cpp
+index 9e90b44..214b634 100644
+--- a/src/WallpaperEngine/Data/Parsers/ModelParser.cpp
++++ b/src/WallpaperEngine/Data/Parsers/ModelParser.cpp
+@@ -31,4 +31,4 @@ ModelUniquePtr ModelParser::parse (const JSON& file, const Project& project, con
+ 	.height = file.optional<int> ("height"),
+ 	.puppet = file.optional<std::string> ("puppet"),
+     });
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/ObjectParser.cpp b/src/WallpaperEngine/Data/Parsers/ObjectParser.cpp
+index 4e35f5a..127604a 100644
+--- a/src/WallpaperEngine/Data/Parsers/ObjectParser.cpp
++++ b/src/WallpaperEngine/Data/Parsers/ObjectParser.cpp
+@@ -12,6 +12,7 @@
+ #include "WallpaperEngine/Logging/Log.h"
+ 
+ #include <glm/gtc/constants.hpp>
++#include <cstdlib>
+ #include <sstream>
+ 
+ using namespace WallpaperEngine::Data::Parsers;
+@@ -69,7 +70,7 @@ ObjectUniquePtr ObjectParser::parse (const JSON& it, const Project& project) {
+ 	return parseImage (it, project, std::move (basedata), *imageIt);
+     } else if (soundIt != it.end () && soundIt->is_array ()) {
+ 	return parseSound (it, std::move (basedata));
+-    } else if (particleIt != it.end ()) {
++    } else if (particleIt != it.end () && !particleIt->is_null ()) {
+ 	return parseParticle (it, project, std::move (basedata));
+     } else if (textIt != it.end ()) {
+ 	return parseText (it, project, std::move (basedata));
+@@ -123,6 +124,16 @@ SoundUniquePtr ObjectParser::parseSound (const JSON& it, ObjectData base) {
+ }
+ 
+ TextUniquePtr ObjectParser::parseText (const JSON& it, const Project& project, ObjectData base) {
++    // padding is usually a number, but some scenes store it as a "x y" string
++    int padding = 0;
++    if (const auto paddingIt = it.find ("padding"); paddingIt != it.end ()) {
++	if (paddingIt->is_number ()) {
++	    padding = paddingIt->get<int> ();
++	} else if (paddingIt->is_string ()) {
++	    padding = static_cast<int> (std::strtof (paddingIt->get<std::string> ().c_str (), nullptr));
++	}
++    }
++
+     return std::make_unique<Text> (
+ 	std::move (base),
+ 	TextData {
+@@ -136,7 +147,7 @@ TextUniquePtr ObjectParser::parseText (const JSON& it, const Project& project, O
+ 	    .visible = it.user ("visible", project.properties, true),
+ 	    .alignment = it.optional ("horizontalalign", it.optional ("alignment", std::string ("center"))),
+ 	    .verticalalign = it.optional ("verticalalign", std::string ("center")),
+-	    .padding = it.optional ("padding", 0),
++	    .padding = padding,
+ 	}
+     );
+ }
+diff --git a/src/WallpaperEngine/Data/Parsers/PackageParser.h b/src/WallpaperEngine/Data/Parsers/PackageParser.h
+index 4bc8c26..18a76df 100644
+--- a/src/WallpaperEngine/Data/Parsers/PackageParser.h
++++ b/src/WallpaperEngine/Data/Parsers/PackageParser.h
+@@ -14,4 +14,4 @@ public:
+ private:
+     static FileEntryList parseFileList (const BinaryReader& stream);
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/PropertyParser.h b/src/WallpaperEngine/Data/Parsers/PropertyParser.h
+index 792d9fe..9497af0 100644
+--- a/src/WallpaperEngine/Data/Parsers/PropertyParser.h
++++ b/src/WallpaperEngine/Data/Parsers/PropertyParser.h
+@@ -20,4 +20,4 @@ private:
+     static PropertySharedPtr parseFile (const JSON& it, const std::string& name);
+     static PropertySharedPtr parseTextInput (const JSON& it, const std::string& name);
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/TextureParser.cpp b/src/WallpaperEngine/Data/Parsers/TextureParser.cpp
+index 07065f2..153d6ca 100644
+--- a/src/WallpaperEngine/Data/Parsers/TextureParser.cpp
++++ b/src/WallpaperEngine/Data/Parsers/TextureParser.cpp
+@@ -401,4 +401,4 @@ void TextureParser::parseSpritesheetMetadata (
+     } catch (const std::exception&) {
+ 	// .tex-json file is optional, only used for spritesheet data
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/TextureParser.h b/src/WallpaperEngine/Data/Parsers/TextureParser.h
+index 85fa078..e210b40 100644
+--- a/src/WallpaperEngine/Data/Parsers/TextureParser.h
++++ b/src/WallpaperEngine/Data/Parsers/TextureParser.h
+@@ -38,4 +38,4 @@ private:
+     static uint32_t parseTextureFlags (uint32_t value);
+     static FIF parseFIF (uint32_t value);
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Parsers/WallpaperParser.cpp b/src/WallpaperEngine/Data/Parsers/WallpaperParser.cpp
+index c108a0d..a7b2a9d 100644
+--- a/src/WallpaperEngine/Data/Parsers/WallpaperParser.cpp
++++ b/src/WallpaperEngine/Data/Parsers/WallpaperParser.cpp
+@@ -101,4 +101,4 @@ ObjectList WallpaperParser::parseObjects (const JSON& objects, const Project& pr
+     }
+ 
+     return result;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Utils/MemoryStream.h b/src/WallpaperEngine/Data/Utils/MemoryStream.h
+index aefba91..3efb5dd 100644
+--- a/src/WallpaperEngine/Data/Utils/MemoryStream.h
++++ b/src/WallpaperEngine/Data/Utils/MemoryStream.h
+@@ -27,4 +27,4 @@ struct MemoryStream : std::istream, private std::streambuf {
+ 
+ using MemoryStreamSharedPtr = std::shared_ptr<MemoryStream>;
+ using MemoryStreamUniquePtr = std::unique_ptr<MemoryStream>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Utils/SFINAE.h b/src/WallpaperEngine/Data/Utils/SFINAE.h
+index d03696d..68801f3 100644
+--- a/src/WallpaperEngine/Data/Utils/SFINAE.h
++++ b/src/WallpaperEngine/Data/Utils/SFINAE.h
+@@ -18,4 +18,4 @@ template <glm::length_t L, typename T, glm::qualifier Q> struct GlmVecTraits<glm
+     static constexpr glm::qualifier qualifier = Q;
+ };
+ 
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Data/Utils/ScopeGuard.h b/src/WallpaperEngine/Data/Utils/ScopeGuard.h
+index a117b7a..4d15efd 100644
+--- a/src/WallpaperEngine/Data/Utils/ScopeGuard.h
++++ b/src/WallpaperEngine/Data/Utils/ScopeGuard.h
+@@ -32,4 +32,4 @@ protected:
+     F func;
+     bool owner;
+ };
+-};
+\ No newline at end of file
++};
+diff --git a/src/WallpaperEngine/FileSystem/Adapters/Directory.cpp b/src/WallpaperEngine/FileSystem/Adapters/Directory.cpp
+index f0e5a85..75eb72a 100644
+--- a/src/WallpaperEngine/FileSystem/Adapters/Directory.cpp
++++ b/src/WallpaperEngine/FileSystem/Adapters/Directory.cpp
+@@ -87,4 +87,4 @@ AdapterSharedPtr DirectoryFactory::create (const std::filesystem::path& path) co
+     }
+ 
+     return std::make_unique<DirectoryAdapter> (finalpath);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/FileSystem/Adapters/MediaCover.cpp b/src/WallpaperEngine/FileSystem/Adapters/MediaCover.cpp
+index 0a993bb..d2dd740 100644
+--- a/src/WallpaperEngine/FileSystem/Adapters/MediaCover.cpp
++++ b/src/WallpaperEngine/FileSystem/Adapters/MediaCover.cpp
+@@ -61,4 +61,4 @@ AdapterSharedPtr MediaCoverFactory::create (const std::filesystem::path& path) c
+     }
+ 
+     return std::make_unique<MediaCoverAdapter> (source);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/FileSystem/Adapters/Package.h b/src/WallpaperEngine/FileSystem/Adapters/Package.h
+index b92a85d..8e72b29 100644
+--- a/src/WallpaperEngine/FileSystem/Adapters/Package.h
++++ b/src/WallpaperEngine/FileSystem/Adapters/Package.h
+@@ -26,4 +26,4 @@ struct PackageAdapter final : Adapter {
+ 
+     PackageUniquePtr package;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/FileSystem/Adapters/Types.h b/src/WallpaperEngine/FileSystem/Adapters/Types.h
+index e53893e..8200792 100644
+--- a/src/WallpaperEngine/FileSystem/Adapters/Types.h
++++ b/src/WallpaperEngine/FileSystem/Adapters/Types.h
+@@ -25,4 +25,4 @@ struct Factory {
+ };
+ 
+ using FactoryUniquePtr = std::unique_ptr<Factory>;
+-} // namespace WallpaperEngine::FileSystem::Adapters
+\ No newline at end of file
++} // namespace WallpaperEngine::FileSystem::Adapters
+diff --git a/src/WallpaperEngine/FileSystem/Adapters/Virtual.h b/src/WallpaperEngine/FileSystem/Adapters/Virtual.h
+index 9ffe160..f478a4f 100644
+--- a/src/WallpaperEngine/FileSystem/Adapters/Virtual.h
++++ b/src/WallpaperEngine/FileSystem/Adapters/Virtual.h
+@@ -29,4 +29,4 @@ struct VirtualAdapter final : Adapter {
+ 
+     std::map<std::filesystem::path, MemoryStreamSharedPtr> files;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/FileSystem/Container.cpp b/src/WallpaperEngine/FileSystem/Container.cpp
+index 6e32acc..3913d7a 100644
+--- a/src/WallpaperEngine/FileSystem/Container.cpp
++++ b/src/WallpaperEngine/FileSystem/Container.cpp
+@@ -101,4 +101,4 @@ Adapter& Container::resolveAdapterForFile (const std::filesystem::path& path) co
+     );
+ }
+ 
+-void Container::registerAdapterFactory (FactoryUniquePtr factory) { this->m_factories.push_back (std::move (factory)); }
+\ No newline at end of file
++void Container::registerAdapterFactory (FactoryUniquePtr factory) { this->m_factories.push_back (std::move (factory)); }
+diff --git a/src/WallpaperEngine/FileSystem/Container.h b/src/WallpaperEngine/FileSystem/Container.h
+index 62e87b6..198cea7 100644
+--- a/src/WallpaperEngine/FileSystem/Container.h
++++ b/src/WallpaperEngine/FileSystem/Container.h
+@@ -74,4 +74,4 @@ private:
+ };
+ 
+ using ContainerUniquePtr = std::unique_ptr<Container>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Input/Drivers/GLFWMouseInput.cpp b/src/WallpaperEngine/Input/Drivers/GLFWMouseInput.cpp
+index 8ddce13..3d361ca 100644
+--- a/src/WallpaperEngine/Input/Drivers/GLFWMouseInput.cpp
++++ b/src/WallpaperEngine/Input/Drivers/GLFWMouseInput.cpp
+@@ -34,4 +34,4 @@ glm::dvec2 GLFWMouseInput::position () const { return this->m_reportedPosition;
+ 
+ WallpaperEngine::Input::MouseClickStatus GLFWMouseInput::leftClick () const { return m_leftClick; }
+ 
+-WallpaperEngine::Input::MouseClickStatus GLFWMouseInput::rightClick () const { return m_rightClick; }
+\ No newline at end of file
++WallpaperEngine::Input::MouseClickStatus GLFWMouseInput::rightClick () const { return m_rightClick; }
+diff --git a/src/WallpaperEngine/Input/InputContext.cpp b/src/WallpaperEngine/Input/InputContext.cpp
+index 3b69f9d..55683b9 100644
+--- a/src/WallpaperEngine/Input/InputContext.cpp
++++ b/src/WallpaperEngine/Input/InputContext.cpp
+@@ -7,4 +7,4 @@ InputContext::InputContext (MouseInput& mouseInput) : m_mouse (mouseInput) { }
+ 
+ void InputContext::update () { this->m_mouse.update (); }
+ 
+-const MouseInput& InputContext::getMouseInput () const { return this->m_mouse; }
+\ No newline at end of file
++const MouseInput& InputContext::getMouseInput () const { return this->m_mouse; }
+diff --git a/src/WallpaperEngine/Logging/Log.cpp b/src/WallpaperEngine/Logging/Log.cpp
+index 904e1b1..50312c7 100644
+--- a/src/WallpaperEngine/Logging/Log.cpp
++++ b/src/WallpaperEngine/Logging/Log.cpp
+@@ -19,4 +19,4 @@ void Log::addOutput (std::ostream* stream) { this->mOutputs.push_back (stream);
+ 
+ void Log::addError (std::ostream* stream) { this->mErrors.push_back (stream); }
+ 
+-std::unique_ptr<Log> Log::sInstance = nullptr;
+\ No newline at end of file
++std::unique_ptr<Log> Log::sInstance = nullptr;
+diff --git a/src/WallpaperEngine/Logging/Log.h b/src/WallpaperEngine/Logging/Log.h
+index 7e25151..530829d 100644
+--- a/src/WallpaperEngine/Logging/Log.h
++++ b/src/WallpaperEngine/Logging/Log.h
+@@ -91,4 +91,4 @@ private:
+ };
+ } // namespace WallpaperEngine::Logging
+ 
+-#define sLog (WallpaperEngine::Logging::Log::get ())
+\ No newline at end of file
++#define sLog (WallpaperEngine::Logging::Log::get ())
+diff --git a/src/WallpaperEngine/Maths.cpp b/src/WallpaperEngine/Maths.cpp
+index 8de63d3..925ed94 100644
+--- a/src/WallpaperEngine/Maths.cpp
++++ b/src/WallpaperEngine/Maths.cpp
+@@ -29,4 +29,4 @@ float WallpaperEngine::Maths::fadeValue (float life, float startTime, float endT
+ 	float t = (life - startTime) / (endTime - startTime);
+ 	return lerp (t, startValue, endValue);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Maths.h b/src/WallpaperEngine/Maths.h
+index 234c151..f5d400d 100644
+--- a/src/WallpaperEngine/Maths.h
++++ b/src/WallpaperEngine/Maths.h
+@@ -8,4 +8,4 @@ float randomFloat (std::mt19937& rng, float min, float max);
+ glm::vec3 randomVec3 (std::mt19937& rng, const glm::vec3& min, const glm::vec3& max);
+ float lerp (float t, float a, float b);
+ float fadeValue (float life, float startTime, float endTime, float startValue, float endValue);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Media/DBusMediaSource.cpp b/src/WallpaperEngine/Media/DBusMediaSource.cpp
+index 83a50f3..0b681eb 100644
+--- a/src/WallpaperEngine/Media/DBusMediaSource.cpp
++++ b/src/WallpaperEngine/Media/DBusMediaSource.cpp
+@@ -62,7 +62,10 @@ DBusMediaSource::DBusMediaSource (std::chrono::milliseconds updateInterval) : Me
+     this->m_connection = dbus_bus_get (DBUS_BUS_SESSION, &err);
+ 
+     if (!this->m_connection) {
+-	sLog.exception ("Could not connect to DBus: ", err.message);
++	// macOS has no session bus: run without media information instead of aborting
++	sLog.error ("Could not connect to DBus: ", err.message);
++	dbus_error_free (&err);
++	return;
+     }
+ 
+     dbus_connection_add_filter (this->m_connection, dbus_message_filter, this, nullptr);
+@@ -79,6 +82,10 @@ DBusMediaSource::DBusMediaSource (std::chrono::milliseconds updateInterval) : Me
+ }
+ 
+ DBusMediaSource::~DBusMediaSource () {
++    if (this->m_connection == nullptr) {
++	return;
++    }
++
+     dbus_connection_remove_filter (this->m_connection, dbus_message_filter, this);
+ 
+     dbus_connection_unref (this->m_connection);
+@@ -220,6 +227,10 @@ void DBusMediaSource::parsePosition (DBusMessageIter& variant) {
+ void DBusMediaSource::update () {
+     this->MediaSource::update ();
+ 
++    if (this->m_connection == nullptr) {
++	return;
++    }
++
+     // drain any dbus events
+     dbus_connection_read_write (this->m_connection, 0);
+ 
+@@ -231,6 +242,10 @@ DBusMessage* DBusMediaSource::dbusMessage (
+     const char* bus_name, const char* path, const char* interface, const char* method, const char* iface,
+     const char* prop
+ ) {
++    if (this->m_connection == nullptr) {
++	return nullptr;
++    }
++
+     DBusError err;
+     dbus_error_init (&err);
+ 
+@@ -367,4 +382,4 @@ void DBusMediaSource::performUpdate () {
+ 	this->m_mediaInfo.position = position;
+ 	this->fireMetadataListeners ();
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Media/DBusMediaSource.h b/src/WallpaperEngine/Media/DBusMediaSource.h
+index 8bc6a18..cce1221 100644
+--- a/src/WallpaperEngine/Media/DBusMediaSource.h
++++ b/src/WallpaperEngine/Media/DBusMediaSource.h
+@@ -27,6 +27,6 @@ protected:
+ 
+     std::optional<std::string> m_currentPlayer = std::nullopt;
+ 
+-    DBusConnection* m_connection;
++    DBusConnection* m_connection = nullptr;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Media/MediaSource.cpp b/src/WallpaperEngine/Media/MediaSource.cpp
+index f3c6126..46f1535 100644
+--- a/src/WallpaperEngine/Media/MediaSource.cpp
++++ b/src/WallpaperEngine/Media/MediaSource.cpp
+@@ -77,4 +77,4 @@ void MediaSource::fireAlbumArtListeners () {
+     for (auto& listener : m_albumArtListeners | std::views::values) {
+ 	listener (m_mediaInfo);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Media/MediaSource.h b/src/WallpaperEngine/Media/MediaSource.h
+index 300a30c..9155a89 100644
+--- a/src/WallpaperEngine/Media/MediaSource.h
++++ b/src/WallpaperEngine/Media/MediaSource.h
+@@ -59,4 +59,4 @@ protected:
+     std::chrono::milliseconds m_updateInterval;
+     std::chrono::time_point<std::chrono::steady_clock> m_nextUpdate;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/AlbumTexture.cpp b/src/WallpaperEngine/Render/AlbumTexture.cpp
+index 2769c0b..7ec7cc5 100644
+--- a/src/WallpaperEngine/Render/AlbumTexture.cpp
++++ b/src/WallpaperEngine/Render/AlbumTexture.cpp
+@@ -133,4 +133,4 @@ void AlbumTexture::load () const {
+ bool AlbumTexture::isReady () const {
+     // these are only ready to be rendered if their content's are present
+     return this->m_width > 0 && this->m_height > 0;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/AlbumTexture.h b/src/WallpaperEngine/Render/AlbumTexture.h
+index af45552..d72f609 100644
+--- a/src/WallpaperEngine/Render/AlbumTexture.h
++++ b/src/WallpaperEngine/Render/AlbumTexture.h
+@@ -40,4 +40,4 @@ private:
+     mutable uint32_t m_height = 0;
+     GLuint m_textureID = GL_NONE;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/CFBO.cpp b/src/WallpaperEngine/Render/CFBO.cpp
+index d925d8f..06012b4 100644
+--- a/src/WallpaperEngine/Render/CFBO.cpp
++++ b/src/WallpaperEngine/Render/CFBO.cpp
+@@ -133,4 +133,4 @@ void CFBO::incrementUsageCount () const { }
+ void CFBO::decrementUsageCount () const { }
+ void CFBO::update () const { }
+ // FBOs are always ready
+-bool CFBO::isReady () const { return true; }
+\ No newline at end of file
++bool CFBO::isReady () const { return true; }
+diff --git a/src/WallpaperEngine/Render/CObject.cpp b/src/WallpaperEngine/Render/CObject.cpp
+index ae3623d..4b766af 100644
+--- a/src/WallpaperEngine/Render/CObject.cpp
++++ b/src/WallpaperEngine/Render/CObject.cpp
+@@ -18,4 +18,4 @@ const AssetLocator& CObject::getAssetLocator () const { return this->getScene ()
+ 
+ int CObject::getId () const { return this->m_object.id; }
+ 
+-const Object& CObject::getObject () const { return this->m_object; }
+\ No newline at end of file
++const Object& CObject::getObject () const { return this->m_object; }
+diff --git a/src/WallpaperEngine/Render/CObject.h b/src/WallpaperEngine/Render/CObject.h
+index 4f09c76..203c232 100644
+--- a/src/WallpaperEngine/Render/CObject.h
++++ b/src/WallpaperEngine/Render/CObject.h
+@@ -28,4 +28,4 @@ private:
+     Wallpapers::CScene& m_scene;
+     const Object& m_object;
+ };
+-} // namespace WallpaperEngine::Render
+\ No newline at end of file
++} // namespace WallpaperEngine::Render
+diff --git a/src/WallpaperEngine/Render/CTexture.cpp b/src/WallpaperEngine/Render/CTexture.cpp
+index 475c482..abfb310 100644
+--- a/src/WallpaperEngine/Render/CTexture.cpp
++++ b/src/WallpaperEngine/Render/CTexture.cpp
+@@ -265,4 +265,4 @@ void CTexture::update () const {
+ }
+ 
+ // CTextures are always ready to be rendered at all times
+-bool CTexture::isReady () const { return true; }
+\ No newline at end of file
++bool CTexture::isReady () const { return true; }
+diff --git a/src/WallpaperEngine/Render/CTexture.h b/src/WallpaperEngine/Render/CTexture.h
+index 06f5537..7d017ae 100644
+--- a/src/WallpaperEngine/Render/CTexture.h
++++ b/src/WallpaperEngine/Render/CTexture.h
+@@ -88,4 +88,4 @@ private:
+     /** The video player in use */
+     GLPlayerUniquePtr m_player;
+ };
+-} // namespace WallpaperEngine::Assets
+\ No newline at end of file
++} // namespace WallpaperEngine::Assets
+diff --git a/src/WallpaperEngine/Render/Camera.cpp b/src/WallpaperEngine/Render/Camera.cpp
+index 6655670..b3e0003 100644
+--- a/src/WallpaperEngine/Render/Camera.cpp
++++ b/src/WallpaperEngine/Render/Camera.cpp
+@@ -49,4 +49,4 @@ void Camera::setOrthogonalProjection (const float width, const float height) {
+     this->m_projection = glm::ortho<float> (-width / 2.0, width / 2.0, -height / 2.0, height / 2.0, nearz, farz);
+     this->m_projection = glm::translate (this->m_projection, this->getEye ());
+     this->m_isOrthogonal = true;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.cpp b/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.cpp
+index 8d70a7a..669a06b 100644
+--- a/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.cpp
++++ b/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.cpp
+@@ -12,4 +12,4 @@ Application::ApplicationContext& FullScreenDetector::getApplicationContext () co
+ 
+ bool FullScreenDetector::anythingFullscreen () const { return false; }
+ 
+-void FullScreenDetector::reset () { }
+\ No newline at end of file
++void FullScreenDetector::reset () { }
+diff --git a/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.h b/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.h
+index a7e29ca..2e17b61 100644
+--- a/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.h
++++ b/src/WallpaperEngine/Render/Drivers/Detectors/FullScreenDetector.h
+@@ -24,4 +24,4 @@ public:
+ private:
+     Application::ApplicationContext& m_applicationContext;
+ };
+-} // namespace WallpaperEngine::Render::Drivers::Detectors
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers::Detectors
+diff --git a/src/WallpaperEngine/Render/Drivers/Detectors/X11FullScreenDetector.h b/src/WallpaperEngine/Render/Drivers/Detectors/X11FullScreenDetector.h
+index de9742c..840abec 100644
+--- a/src/WallpaperEngine/Render/Drivers/Detectors/X11FullScreenDetector.h
++++ b/src/WallpaperEngine/Render/Drivers/Detectors/X11FullScreenDetector.h
+@@ -30,4 +30,4 @@ namespace Detectors {
+ 	VideoDriver& m_driver;
+     };
+ } // namespace Detectors
+-} // namespace WallpaperEngine::Render::Drivers
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers
+diff --git a/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.cpp b/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.cpp
+index 01063d9..33bf039 100644
+--- a/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.cpp
++++ b/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.cpp
+@@ -6,10 +6,12 @@
+ #include "WallpaperEngine/Render/Drivers/Output/X11Output.h"
+ #endif
+ 
+-#define GLFW_EXPOSE_NATIVE_X11
+ #include "WallpaperEngine/Debugging/CallStack.h"
+ 
++#ifdef ENABLE_X11
++#define GLFW_EXPOSE_NATIVE_X11
+ #include <GLFW/glfw3native.h>
++#endif
+ 
+ #include <unistd.h>
+ 
+@@ -27,7 +29,13 @@ GLFWOpenGLDriver::GLFWOpenGLDriver (const char* windowTitle, ApplicationContext&
+     }
+ 
+     // set some window hints (opengl version to be used)
++#ifdef __APPLE__
++    // scenes render into their own framebuffers: multisampling the window only costs GPU time on the final copy
++    glfwWindowHint (GLFW_SAMPLES, 0);
++    glfwWindowHint (GLFW_COCOA_RETINA_FRAMEBUFFER, getenv ("LWE_NO_RETINA") ? GLFW_FALSE : GLFW_TRUE);
++#else
+     glfwWindowHint (GLFW_SAMPLES, 4);
++#endif
+     glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
+     glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+     glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+@@ -151,6 +159,12 @@ void GLFWOpenGLDriver::dispatchEventQueue () {
+     glfwPollEvents ();
+     // increase frame counter
+     this->m_frameCounter++;
++#ifdef __APPLE__
++    // reparented to launchd: Open Wallpaper Engine quit or crashed, do not linger on the desktop
++    if (getenv ("LWE_DESKTOP") != nullptr && getppid () == 1) {
++	_exit (0);
++    }
++#endif
+     // get the end time of the frame
+     endTime = this->getRenderTime ();
+ 
+diff --git a/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.h b/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.h
+index 6061400..4fc627d 100644
+--- a/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.h
++++ b/src/WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.h
+@@ -42,4 +42,4 @@ private:
+     GLFWwindow* m_window = nullptr;
+     uint32_t m_frameCounter = 0;
+ };
+-} // namespace WallpaperEngine::Render::Drivers
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/GLFWOutputViewport.cpp b/src/WallpaperEngine/Render/Drivers/Output/GLFWOutputViewport.cpp
+index 446da1e..ad5e221 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/GLFWOutputViewport.cpp
++++ b/src/WallpaperEngine/Render/Drivers/Output/GLFWOutputViewport.cpp
+@@ -9,4 +9,4 @@ GLFWOutputViewport::GLFWOutputViewport (glm::ivec4 viewport, std::string name) :
+ 
+ void GLFWOutputViewport::makeCurrent () { }
+ 
+-void GLFWOutputViewport::swapOutput () { }
+\ No newline at end of file
++void GLFWOutputViewport::swapOutput () { }
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.cpp b/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.cpp
+index bd84373..2199f2d 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.cpp
++++ b/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.cpp
+@@ -4,8 +4,39 @@
+ #include <GL/glew.h>
+ #include <GLFW/glfw3.h>
+ 
++#include <cstdlib>
+ #include <unistd.h>
+ 
++#ifdef __APPLE__
++#include "WallpaperEngine/Render/Drivers/GLFWOpenGLDriver.h"
++#define GLFW_EXPOSE_NATIVE_COCOA
++#include <GLFW/glfw3native.h>
++#include <objc/message.h>
++#include <objc/runtime.h>
++
++namespace {
++// LWE_DESKTOP=1: turn the window into a desktop wallpaper (behind icons, on every Space, click-through)
++void attachToDesktop (GLFWwindow* window) {
++    const auto nsWindow = reinterpret_cast<id> (glfwGetCocoaWindow (window));
++    const auto send = [nsWindow] (const char* selector, long value) {
++	reinterpret_cast<void (*) (id, SEL, long)> (objc_msgSend) (nsWindow, sel_registerName (selector), value);
++    };
++
++    send ("setLevel:", -2147483623 + 1); // just above kCGDesktopWindowLevel (the host app sits there), below icons
++    send ("setCollectionBehavior:", 1 | 16 | 64); // canJoinAllSpaces | stationary | ignoresCycle
++    send ("setIgnoresMouseEvents:", 1);
++}
++
++// accessory process: no Dock icon and no menu bar (prohibited would hide the window)
++void becomeAccessory () {
++    const auto app = reinterpret_cast<id (*) (id, SEL)> (objc_msgSend) (
++	reinterpret_cast<id> (objc_getClass ("NSApplication")), sel_registerName ("sharedApplication")
++    );
++    reinterpret_cast<void (*) (id, SEL, long)> (objc_msgSend) (app, sel_registerName ("setActivationPolicy:"), 1);
++}
++}
++#endif
++
+ using namespace WallpaperEngine::Render::Drivers::Output;
+ 
+ GLFWWindowOutput::GLFWWindowOutput (ApplicationContext& context, VideoDriver& driver) : Output (context, driver) {
+@@ -14,13 +45,26 @@ GLFWWindowOutput::GLFWWindowOutput (ApplicationContext& context, VideoDriver& dr
+ 	sLog.exception ("Initializing window output when not in output mode, how did you get here?!");
+     }
+ 
+-    // window should be visible
+-    driver.showWindow ();
++    // window should be visible, unless rendering only for screenshots (LWE_HIDDEN_WINDOW, renders into FBOs anyway)
++    if (getenv ("LWE_HIDDEN_WINDOW") == nullptr) {
++	driver.showWindow ();
++    }
++
++#ifdef __APPLE__
++    if (getenv ("LWE_HIDDEN_WINDOW") != nullptr || getenv ("LWE_DESKTOP") != nullptr) {
++	becomeAccessory ();
++    }
++#endif
+ 
+     if (this->m_context.settings.render.mode == Application::ApplicationContext::EXPLICIT_WINDOW) {
+ 	this->m_fullWidth = this->m_context.settings.render.window.geometry.z;
+ 	this->m_fullHeight = this->m_context.settings.render.window.geometry.w;
+ 	this->repositionWindow ();
++#ifdef __APPLE__
++	if (getenv ("LWE_DESKTOP") != nullptr) {
++	    attachToDesktop (static_cast<GLFWOpenGLDriver&> (this->m_driver).getWindow ());
++	}
++#endif
+     } else {
+ 	// take the size from the driver (default window size)
+ 	this->m_fullWidth = this->m_driver.getFramebufferSize ().x;
+@@ -63,4 +107,4 @@ void GLFWWindowOutput::updateRender () const {
+ 
+     // update the default viewport
+     this->m_viewports["default"]->viewport = { 0, 0, this->m_fullWidth, this->m_fullHeight };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.h b/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.h
+index 4eb015d..9182b9b 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.h
++++ b/src/WallpaperEngine/Render/Drivers/Output/GLFWWindowOutput.h
+@@ -19,4 +19,4 @@ public:
+ private:
+     void repositionWindow () const;
+ };
+-} // namespace WallpaperEngine::Render::Drivers::Output
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers::Output
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/Output.h b/src/WallpaperEngine/Render/Drivers/Output/Output.h
+index 2169a40..2f41a3b 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/Output.h
++++ b/src/WallpaperEngine/Render/Drivers/Output/Output.h
+@@ -49,4 +49,4 @@ namespace Output {
+ 	VideoDriver& m_driver;
+     };
+ } // namespace Output
+-} // namespace WallpaperEngine::Render::Drivers
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.cpp b/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.cpp
+index 024363a..ee73c98 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.cpp
++++ b/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.cpp
+@@ -43,4 +43,4 @@ void* WaylandOutput::getImageBuffer () const { return nullptr; }
+ 
+ uint32_t WaylandOutput::getImageBufferSize () const { return 0; }
+ 
+-void WaylandOutput::updateRender () const { }
+\ No newline at end of file
++void WaylandOutput::updateRender () const { }
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.h b/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.h
+index 02849db..447af9d 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.h
++++ b/src/WallpaperEngine/Render/Drivers/Output/WaylandOutput.h
+@@ -32,4 +32,4 @@ namespace Output {
+     };
+ } // namespace Output
+ } // namespace WallpaperEngine::Render::Drivers
+-#endif /* ENABLE_WAYLAND */
+\ No newline at end of file
++#endif /* ENABLE_WAYLAND */
+diff --git a/src/WallpaperEngine/Render/Drivers/Output/X11Output.h b/src/WallpaperEngine/Render/Drivers/Output/X11Output.h
+index e164b51..cea5526 100644
+--- a/src/WallpaperEngine/Render/Drivers/Output/X11Output.h
++++ b/src/WallpaperEngine/Render/Drivers/Output/X11Output.h
+@@ -41,4 +41,4 @@ private:
+     XImage* m_image = nullptr;
+     std::vector<OutputViewport*> m_screens = {};
+ };
+-} // namespace WallpaperEngine::Render::Drivers::Output
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers::Output
+diff --git a/src/WallpaperEngine/Render/Drivers/VideoDriver.cpp b/src/WallpaperEngine/Render/Drivers/VideoDriver.cpp
+index 573ce77..2581b98 100644
+--- a/src/WallpaperEngine/Render/Drivers/VideoDriver.cpp
++++ b/src/WallpaperEngine/Render/Drivers/VideoDriver.cpp
+@@ -8,4 +8,4 @@ VideoDriver::VideoDriver (WallpaperApplication& app, MouseInput& mouseInput) :
+ 
+ WallpaperApplication& VideoDriver::getApp () const { return this->m_app; }
+ 
+-InputContext& VideoDriver::getInputContext () { return this->m_inputContext; }
+\ No newline at end of file
++InputContext& VideoDriver::getInputContext () { return this->m_inputContext; }
+diff --git a/src/WallpaperEngine/Render/Drivers/VideoDriver.h b/src/WallpaperEngine/Render/Drivers/VideoDriver.h
+index 505d18e..16e12d1 100644
+--- a/src/WallpaperEngine/Render/Drivers/VideoDriver.h
++++ b/src/WallpaperEngine/Render/Drivers/VideoDriver.h
+@@ -86,4 +86,4 @@ private:
+     WallpaperApplication& m_app;
+     Input::InputContext m_inputContext;
+ };
+-} // namespace WallpaperEngine::Render::Drivers
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Drivers
+diff --git a/src/WallpaperEngine/Render/Drivers/VideoFactories.cpp b/src/WallpaperEngine/Render/Drivers/VideoFactories.cpp
+index a7045cb..53565c6 100644
+--- a/src/WallpaperEngine/Render/Drivers/VideoFactories.cpp
++++ b/src/WallpaperEngine/Render/Drivers/VideoFactories.cpp
+@@ -90,4 +90,4 @@ std::unique_ptr<Detectors::FullScreenDetector> VideoFactories::createFullscreenD
+     return it->second (context, driver);
+ }
+ 
+-std::unique_ptr<VideoFactories> VideoFactories::sInstance = nullptr;
+\ No newline at end of file
++std::unique_ptr<VideoFactories> VideoFactories::sInstance = nullptr;
+diff --git a/src/WallpaperEngine/Render/Drivers/VideoFactories.h b/src/WallpaperEngine/Render/Drivers/VideoFactories.h
+index 426c341..29a6bf3 100644
+--- a/src/WallpaperEngine/Render/Drivers/VideoFactories.h
++++ b/src/WallpaperEngine/Render/Drivers/VideoFactories.h
+@@ -77,4 +77,4 @@ private:
+ };
+ } // namespace WallpaperEngine::Render::Drivers
+ 
+-#define sVideoFactories (WallpaperEngine::Render::Drivers::VideoFactories::get ())
+\ No newline at end of file
++#define sVideoFactories (WallpaperEngine::Render::Drivers::VideoFactories::get ())
+diff --git a/src/WallpaperEngine/Render/Drivers/WaylandOpenGLDriver.h b/src/WallpaperEngine/Render/Drivers/WaylandOpenGLDriver.h
+index a42a59f..a6b879c 100644
+--- a/src/WallpaperEngine/Render/Drivers/WaylandOpenGLDriver.h
++++ b/src/WallpaperEngine/Render/Drivers/WaylandOpenGLDriver.h
+@@ -106,4 +106,4 @@ private:
+     std::chrono::high_resolution_clock::time_point renderStart = std::chrono::high_resolution_clock::now ();
+ };
+ } // namespace WallpaperEngine::Render::Drivers
+-#endif /* ENABLE_WAYLAND */
+\ No newline at end of file
++#endif /* ENABLE_WAYLAND */
+diff --git a/src/WallpaperEngine/Render/FBOProvider.cpp b/src/WallpaperEngine/Render/FBOProvider.cpp
+index 556a6eb..8f3fb2e 100644
+--- a/src/WallpaperEngine/Render/FBOProvider.cpp
++++ b/src/WallpaperEngine/Render/FBOProvider.cpp
+@@ -38,4 +38,4 @@ std::shared_ptr<CFBO> FBOProvider::find (const std::string& name) const {
+     }
+ 
+     return this->m_parent->find (name);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/Helpers/ContextAware.cpp b/src/WallpaperEngine/Render/Helpers/ContextAware.cpp
+index 0100373..361e724 100644
+--- a/src/WallpaperEngine/Render/Helpers/ContextAware.cpp
++++ b/src/WallpaperEngine/Render/Helpers/ContextAware.cpp
+@@ -8,4 +8,4 @@ ContextAware::ContextAware (const ContextAware* from) : ContextAware (from->getC
+ ContextAware::ContextAware (RenderContext& context) : m_context (context) { }
+ 
+ RenderContext& ContextAware::getContext () const { return this->m_context; }
+-} // namespace WallpaperEngine::Render::Helpers
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Helpers
+diff --git a/src/WallpaperEngine/Render/Helpers/ContextAware.h b/src/WallpaperEngine/Render/Helpers/ContextAware.h
+index 1c4327b..4f79e8e 100644
+--- a/src/WallpaperEngine/Render/Helpers/ContextAware.h
++++ b/src/WallpaperEngine/Render/Helpers/ContextAware.h
+@@ -30,4 +30,4 @@ namespace Helpers {
+ 	RenderContext& m_context;
+     };
+ } // namespace Helpers
+-} // namespace WallpaperEngine::Render
+\ No newline at end of file
++} // namespace WallpaperEngine::Render
+diff --git a/src/WallpaperEngine/Render/Objects/CImage.cpp b/src/WallpaperEngine/Render/Objects/CImage.cpp
+index be0baca..9534e0d 100644
+--- a/src/WallpaperEngine/Render/Objects/CImage.cpp
++++ b/src/WallpaperEngine/Render/Objects/CImage.cpp
+@@ -918,6 +918,8 @@ void CImage::render () {
+ 
+     glColorMask (true, true, true, true);
+ 
++    this->m_color4 = glm::vec4 (this->getColor (), this->getAlpha ());
++
+     // Always update screen transform (handles rotation + parallax dynamically)
+     this->updateScreenSpacePosition ();
+ 
+@@ -957,7 +959,7 @@ const float& CImage::getAlpha () const { return this->m_image.alpha->value->getF
+ 
+ const glm::vec3& CImage::getColor () const { return this->m_image.color->value->getVec3 (); }
+ 
+-const glm::vec4& CImage::getColor4 () const { return this->m_image.color->value->getVec4 (); }
++const glm::vec4& CImage::getColor4 () const { return this->m_color4; }
+ 
+ const glm::vec3& CImage::getCompositeColor () const { return this->m_image.color->value->getVec3 (); }
+ 
+diff --git a/src/WallpaperEngine/Render/Objects/CImage.h b/src/WallpaperEngine/Render/Objects/CImage.h
+index 07eeda2..56412b7 100644
+--- a/src/WallpaperEngine/Render/Objects/CImage.h
++++ b/src/WallpaperEngine/Render/Objects/CImage.h
+@@ -127,6 +127,8 @@ private:
+     glm::vec4 m_pos = {};
+     glm::vec3 m_sceneCenter = {};
+     glm::vec2 m_size = {};
++    /** g_Color4 is the color with the layer alpha (VERSION 2 shaders only multiply by it), refreshed every frame */
++    glm::vec4 m_color4 = glm::vec4 (1.0f);
+ 
+     bool m_initialized = false;
+ 
+diff --git a/src/WallpaperEngine/Render/Objects/CRenderable.cpp b/src/WallpaperEngine/Render/Objects/CRenderable.cpp
+index f4efc34..f9e2131 100644
+--- a/src/WallpaperEngine/Render/Objects/CRenderable.cpp
++++ b/src/WallpaperEngine/Render/Objects/CRenderable.cpp
+@@ -38,4 +38,4 @@ void CRenderable::setup () {
+ 
+ std::shared_ptr<const TextureProvider> CRenderable::getTexture () const { return this->m_texture; }
+ 
+-double CRenderable::getAnimationTime () const { return this->m_animationTime; }
+\ No newline at end of file
++double CRenderable::getAnimationTime () const { return this->m_animationTime; }
+diff --git a/src/WallpaperEngine/Render/Objects/Effects/CPass.cpp b/src/WallpaperEngine/Render/Objects/Effects/CPass.cpp
+index e93c293..4157086 100644
+--- a/src/WallpaperEngine/Render/Objects/Effects/CPass.cpp
++++ b/src/WallpaperEngine/Render/Objects/Effects/CPass.cpp
+@@ -833,6 +833,12 @@ void CPass::setupTextureUniforms () {
+     this->m_texture0Resolution = *texture->getResolution ();
+     this->addUniform ("g_Texture0Resolution", &this->m_texture0Resolution);
+ 
++    // unbound slots get a neutral resolution: some shaders scale coordinates by z/x of another slot's resolution,
++    // which would otherwise be 0/0 (Wallpaper Engine renders those as if the ratio was 1)
++    for (int textureIndex = 1; textureIndex < 8; textureIndex++) {
++	this->addUniform ("g_Texture" + std::to_string (textureIndex) + "Resolution", glm::vec4 (1.0f));
++    }
++
+     for (const auto& [textureIndex, expectedTexture] : this->m_textures) {
+ 	std::ostringstream namestream;
+ 
+@@ -856,12 +862,12 @@ void CPass::setupUniforms () {
+     // lighting variables
+     this->addUniform ("g_LightAmbientColor", sceneData.colors.ambient->value->getVec3 ());
+     this->addUniform ("g_LightSkylightColor", sceneData.colors.skylight->value->getVec3 ());
+-    // register variables like brightness and alpha with some default value
+-    this->addUniform ("g_Brightness", renderable.getBrightness ());
+-    this->addUniform ("g_UserAlpha", renderable.getUserAlpha ());
+-    this->addUniform ("g_Alpha", renderable.getAlpha ());
+-    this->addUniform ("g_Color", renderable.getColor ());
+-    this->addUniform ("g_Color4", renderable.getColor4 ());
++    // register variables like brightness and alpha by address so keyframe animations and scripts reach the shader
++    this->addUniform ("g_Brightness", &renderable.getBrightness ());
++    this->addUniform ("g_UserAlpha", &renderable.getUserAlpha ());
++    this->addUniform ("g_Alpha", &renderable.getAlpha ());
++    this->addUniform ("g_Color", &renderable.getColor ());
++    this->addUniform ("g_Color4", &renderable.getColor4 ());
+     if (!this->m_uniforms.contains ("g_CompositeColor")) {
+ 	this->addUniform ("g_CompositeColor", renderable.getCompositeColor ());
+     }
+diff --git a/src/WallpaperEngine/Render/Shaders/GLSLContext.cpp b/src/WallpaperEngine/Render/Shaders/GLSLContext.cpp
+index dd4f4d4..cd72211 100644
+--- a/src/WallpaperEngine/Render/Shaders/GLSLContext.cpp
++++ b/src/WallpaperEngine/Render/Shaders/GLSLContext.cpp
+@@ -1,8 +1,13 @@
+ #include "GLSLContext.h"
++
++#include <cstdlib>
++#include <fstream>
+ #include "WallpaperEngine/Logging/Log.h"
+ 
+ #include <cassert>
+ #include <memory>
++#include <regex>
++#include <sstream>
+ 
+ #include "SPIRV/GlslangToSpv.h"
+ #include "glslang/Include/ResourceLimits.h"
+@@ -131,40 +136,125 @@ GLSLContext& GLSLContext::get () {
+     return *sInstance;
+ }
+ 
++namespace {
++// Wallpaper Engine compiles shaders like HLSL, where a vec4 silently truncates to a smaller vector (e.g. a vec4
++// v_TexCoord used as texture coordinates, or a vec4 multiplied by a vec2). GLSL rejects that, so on every line
++// glslang reports, un-swizzled vec4 identifiers get the swizzle of the size the error message expects.
++// It also tolerates a stray #endif, which is dropped here.
++std::string repairImplicitTruncation (const std::string& source, const std::string& infoLog) {
++    static const std::regex errorLine (
++	R"(ERROR: 0:(\d+): .*(wrong operand types|cannot convert|no matching overloaded function).*)"
++    );
++    static const std::regex components (R"(([123])-component)");
++    static const std::regex declaration (R"(\bvec4\s+(\w+))");
++
++    std::vector<std::string> lines;
++    std::stringstream stream (source);
++    for (std::string line; std::getline (stream, line);) {
++	lines.push_back (line);
++    }
++
++    std::vector<std::string> names;
++    for (std::sregex_iterator it (source.begin (), source.end (), declaration), end; it != end; ++it) {
++	names.push_back ((*it)[1]);
++    }
++
++    bool changed = false;
++
++    // a stray #endif is ignored by Wallpaper Engine's preprocessor
++    static const std::regex strayEndif (R"(ERROR: 0:(\d+): '#endif' : mismatched statements)");
++    for (std::sregex_iterator it (infoLog.begin (), infoLog.end (), strayEndif), end; it != end; ++it) {
++	if (const size_t index = std::stoul ((*it)[1]) - 1; index < lines.size () && !lines[index].empty ()) {
++	    lines[index].clear ();
++	    changed = true;
++	}
++    }
++
++    for (std::sregex_iterator it (infoLog.begin (), infoLog.end (), errorLine), end; it != end; ++it) {
++	const size_t index = std::stoul ((*it)[1]) - 1;
++	if (index >= lines.size ()) {
++	    continue;
++	}
++
++	const std::string message = (*it)[0];
++	std::smatch size;
++	const std::string swizzle = std::regex_search (message, size, components)
++	    ? std::string ("xyz").substr (0, std::stoi (size[1]))
++	    : "xy";
++
++	for (const auto& name : names) {
++	    // skip the declaration itself and anything already swizzled or indexed
++	    if (std::regex_search (lines[index], std::regex ("\\bvec4\\s+" + name + "\\b"))) {
++		continue;
++	    }
++
++	    const std::string repaired = std::regex_replace (
++		lines[index], std::regex ("\\b" + name + "\\b(?!\\s*[.\\[(])"), name + "." + swizzle
++	    );
++	    changed |= repaired != lines[index];
++	    lines[index] = repaired;
++	}
++    }
++
++    if (!changed) {
++	return source;
++    }
++
++    std::string result;
++    for (const auto& line : lines) {
++	result += line + "\n";
++    }
++    return result;
++}
++
++std::unique_ptr<glslang::TShader> compileUnit (EShLanguage stage, std::string source, const char* kind) {
++    for (int attempt = 0;; attempt++) {
++	auto shader = std::make_unique<glslang::TShader> (stage);
++	const char* pointer = source.c_str ();
++	shader->setStrings (&pointer, 1);
++	shader->setEntryPoint ("main");
++	shader->setEnvInput (glslang::EShSourceGlsl, stage, glslang::EShClientOpenGL, 330);
++	shader->setEnvClient (glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
++	shader->setEnvTarget (glslang::EShTargetSpv, glslang::EShTargetSpv_1_5);
++	shader->setAutoMapLocations (true);
++	shader->setAutoMapBindings (true);
++
++	if (shader->parse (&BuiltInResource, 100, false, EShMsgDefault)) {
++	    return shader;
++	}
++
++	if (attempt < 16) {
++	    if (std::string repaired = repairImplicitTruncation (source, shader->getInfoLog ()); repaired != source) {
++		source = std::move (repaired);
++		continue;
++	    }
++	}
++
++	sLog.error ("GLSL ", kind, " unit parsing Failed: ", shader->getInfoLog ());
++	// LWE_SHADER_DEBUG=<dir>: keep the preprocessed source that failed, to find the offending line
++	if (const char* dumpDir = getenv ("LWE_SHADER_DEBUG"); dumpDir != nullptr) {
++	    std::ofstream (std::string (dumpDir) + "/failed-" + std::to_string (std::hash<std::string> {} (source)) + "." + kind)
++		<< source;
++	}
++	return nullptr;
++    }
++}
++}
++
+ std::pair<std::string, std::string> GLSLContext::toGlsl (const std::string& vertex, const std::string& fragment) {
+-    glslang::TShader vertexShader (EShLangVertex);
+-
+-    const char* vertexSource = vertex.c_str ();
+-    vertexShader.setStrings (&vertexSource, 1);
+-    vertexShader.setEntryPoint ("main");
+-    vertexShader.setEnvInput (glslang::EShSourceGlsl, EShLangVertex, glslang::EShClientOpenGL, 330);
+-    vertexShader.setEnvClient (glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
+-    vertexShader.setEnvTarget (glslang::EShTargetSpv, glslang::EShTargetSpv_1_5);
+-    vertexShader.setAutoMapLocations (true);
+-    vertexShader.setAutoMapBindings (true);
+-
+-    if (!vertexShader.parse (&BuiltInResource, 100, false, EShMsgDefault)) {
+-	sLog.error ("GLSL vertex unit parsing Failed: ", vertexShader.getInfoLog ());
++    const auto vertexShader = compileUnit (EShLangVertex, vertex, "vertex");
++    if (vertexShader == nullptr) {
+ 	return { "", "" };
+     }
+-    glslang::TShader fragmentShader (EShLangFragment);
+-
+-    const char* fragmentSource = fragment.c_str ();
+-    fragmentShader.setStrings (&fragmentSource, 1);
+-    fragmentShader.setEntryPoint ("main");
+-    fragmentShader.setEnvInput (glslang::EShSourceGlsl, EShLangFragment, glslang::EShClientOpenGL, 330);
+-    fragmentShader.setEnvClient (glslang::EShClientOpenGL, glslang::EShTargetOpenGL_450);
+-    fragmentShader.setEnvTarget (glslang::EShTargetSpv, glslang::EShTargetSpv_1_5);
+-    fragmentShader.setAutoMapLocations (true);
+-    fragmentShader.setAutoMapBindings (true);
+-
+-    if (!fragmentShader.parse (&BuiltInResource, 100, false, EShMsgDefault)) {
+-	sLog.error ("GLSL fragment unit parsing Failed: ", fragmentShader.getInfoLog ());
++
++    const auto fragmentShader = compileUnit (EShLangFragment, fragment, "fragment");
++    if (fragmentShader == nullptr) {
+ 	return { "", "" };
+     }
++
+     glslang::TProgram program;
+-    program.addShader (&vertexShader);
+-    program.addShader (&fragmentShader);
++    program.addShader (vertexShader.get ());
++    program.addShader (fragmentShader.get ());
+ 
+     if (!program.link (EShMsgDefault)) {
+ 	sLog.error ("Program Linking Failed: ", program.getInfoLog ());
+@@ -178,6 +268,8 @@ std::pair<std::string, std::string> GLSLContext::toGlsl (const std::string& vert
+     spirv_cross::CompilerGLSL::Options options;
+     options.version = 330;
+     options.es = false;
++    // macOS OpenGL lacks GL_ARB_shading_language_420pack; samplers are bound by name, so drop layout(binding)
++    options.enable_420pack_extension = false;
+     vertexCompiler.set_common_options (options);
+ 
+     spirv.clear ();
+@@ -188,8 +280,13 @@ std::pair<std::string, std::string> GLSLContext::toGlsl (const std::string& vert
+     options.es = false;
+     fragmentCompiler.set_common_options (options);
+ 
++#ifdef __APPLE__
++    // Apple's GLSL compiler still validates directives inside #if 0, so the original source can't be kept there
++    return { vertexCompiler.compile (), fragmentCompiler.compile () };
++#else
+     return { vertexCompiler.compile () + "#if 0\n" + vertex + "\n#endif",
+ 	     fragmentCompiler.compile () + "#if 0\n" + fragment + "\n#endif" };
++#endif
+ }
+ 
+-std::unique_ptr<GLSLContext> GLSLContext::sInstance = nullptr;
+\ No newline at end of file
++std::unique_ptr<GLSLContext> GLSLContext::sInstance = nullptr;
+diff --git a/src/WallpaperEngine/Render/Shaders/GLSLContext.h b/src/WallpaperEngine/Render/Shaders/GLSLContext.h
+index 2189fb3..35c91e7 100644
+--- a/src/WallpaperEngine/Render/Shaders/GLSLContext.h
++++ b/src/WallpaperEngine/Render/Shaders/GLSLContext.h
+@@ -24,4 +24,4 @@ public:
+ private:
+     static std::unique_ptr<GLSLContext> sInstance;
+ };
+-} // namespace WallpaperEngine::Render::Shaders
+\ No newline at end of file
++} // namespace WallpaperEngine::Render::Shaders
+diff --git a/src/WallpaperEngine/Render/Shaders/Variables/ShaderVariable.cpp b/src/WallpaperEngine/Render/Shaders/Variables/ShaderVariable.cpp
+index a1c506d..d608aff 100644
+--- a/src/WallpaperEngine/Render/Shaders/Variables/ShaderVariable.cpp
++++ b/src/WallpaperEngine/Render/Shaders/Variables/ShaderVariable.cpp
+@@ -12,4 +12,4 @@ void ShaderVariable::setIdentifierName (std::string identifierName) {
+     this->m_identifierName = std::move (identifierName);
+ }
+ 
+-void ShaderVariable::setName (const std::string& name) { this->m_name = name; }
+\ No newline at end of file
++void ShaderVariable::setName (const std::string& name) { this->m_name = name; }
+diff --git a/src/WallpaperEngine/Render/TextureProvider.h b/src/WallpaperEngine/Render/TextureProvider.h
+index 1c84cf3..d0a0448 100644
+--- a/src/WallpaperEngine/Render/TextureProvider.h
++++ b/src/WallpaperEngine/Render/TextureProvider.h
+@@ -102,4 +102,4 @@ public:
+      */
+     virtual void update () const = 0;
+ };
+-} // namespace WallpaperEngine::Render
+\ No newline at end of file
++} // namespace WallpaperEngine::Render
+diff --git a/src/WallpaperEngine/Render/WallpaperState.cpp b/src/WallpaperEngine/Render/WallpaperState.cpp
+index 6f9dc1a..7cf0fd1 100644
+--- a/src/WallpaperEngine/Render/WallpaperState.cpp
++++ b/src/WallpaperEngine/Render/WallpaperState.cpp
+@@ -183,4 +183,4 @@ void WallpaperState::updateState (
+ 	    );
+ 	    break;
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Render/WallpaperState.h b/src/WallpaperEngine/Render/WallpaperState.h
+index 9b05f6b..ec856be 100644
+--- a/src/WallpaperEngine/Render/WallpaperState.h
++++ b/src/WallpaperEngine/Render/WallpaperState.h
+@@ -136,4 +136,4 @@ private:
+     TextureUVsScaling m_textureUVsMode = TextureUVsScaling::DefaultUVs;
+     uint32_t m_clampingMode = TextureFlags_NoFlags;
+ };
+-} // namespace WallpaperEngine::Render
+\ No newline at end of file
++} // namespace WallpaperEngine::Render
+diff --git a/src/WallpaperEngine/Render/Wallpapers/CScene.cpp b/src/WallpaperEngine/Render/Wallpapers/CScene.cpp
+index 4933440..166d1ba 100644
+--- a/src/WallpaperEngine/Render/Wallpapers/CScene.cpp
++++ b/src/WallpaperEngine/Render/Wallpapers/CScene.cpp
+@@ -315,6 +315,9 @@ void CScene::renderFrame (const glm::ivec4& viewport) {
+ 	    = glm::mix (this->m_parallaxDisplacement, (centeredMouse * amount) * influence, delay);
+     }
+ 
++    // advance keyframe-animated properties first so scripts can still override them
++    Data::Model::DynamicValue::animateAll (g_Time);
++
+     // run a tick in the javascript logic
+     this->getScriptEngine ().tick ();
+ 
+diff --git a/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.cpp b/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.cpp
+index e5fd26c..984f564 100644
+--- a/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.cpp
++++ b/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.cpp
+@@ -27,4 +27,4 @@ void ObjectAdapter::registerType (const JSClassDef& definition) {
+ 
+     JS_NewClassID (this->m_engine.getRuntime (), &this->m_classId);
+     JS_NewClass (this->m_engine.getRuntime (), this->m_classId, &definition);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.h b/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.h
+index 2d43882..e518a07 100644
+--- a/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.h
++++ b/src/WallpaperEngine/Scripting/Adapters/ObjectAdapter.h
+@@ -29,4 +29,4 @@ protected:
+     JSClassID m_classId;
+     JSClassDef m_definition;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.cpp b/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.cpp
+index f62ad1d..490f7ec 100644
+--- a/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.cpp
++++ b/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.cpp
+@@ -87,4 +87,4 @@ JSValue ScriptableObjectAdapter::instantiate (ScriptableObject& object) {
+ 
+ JSValue ScriptableObjectAdapter::instantiate (DynamicValue& value) {
+     throw std::runtime_error ("Cannot create a ScriptableObject instance from a DynamicValue");
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.h b/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.h
+index ea8bc32..77004da 100644
+--- a/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.h
++++ b/src/WallpaperEngine/Scripting/Adapters/ScriptableObjectAdapter.h
+@@ -1,5 +1,7 @@
+ #pragma once
+ 
++#include <string>
++
+ #include "ObjectAdapter.h"
+ 
+ namespace WallpaperEngine::Scripting::Adapters {
+@@ -14,4 +16,4 @@ private:
+     JSClassExoticMethods m_exoticMethods;
+     std::string m_name;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.cpp b/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.cpp
+index 1162bf2..1b2e84d 100644
+--- a/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.cpp
++++ b/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.cpp
+@@ -1002,4 +1002,4 @@ namespace WallpaperEngine::Scripting::Adapters {
+ template class VectorAdapter<2>;
+ template class VectorAdapter<3>;
+ template class VectorAdapter<4>;
+-} // namespace WallpaperEngine::Scripting::Adapters
+\ No newline at end of file
++} // namespace WallpaperEngine::Scripting::Adapters
+diff --git a/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.h b/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.h
+index 0ccb5e4..b14523f 100644
+--- a/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.h
++++ b/src/WallpaperEngine/Scripting/Adapters/VectorAdapter.h
+@@ -31,4 +31,4 @@ private:
+ extern template class VectorAdapter<2>;
+ extern template class VectorAdapter<3>;
+ extern template class VectorAdapter<4>;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/ConsoleObject.cpp b/src/WallpaperEngine/Scripting/ConsoleObject.cpp
+index bdb2234..2b3facb 100644
+--- a/src/WallpaperEngine/Scripting/ConsoleObject.cpp
++++ b/src/WallpaperEngine/Scripting/ConsoleObject.cpp
+@@ -66,4 +66,4 @@ ConsoleObject::ConsoleObject (ScriptEngine& engine, Render::Wallpapers::CScene&
+     );
+ }
+ 
+-ConsoleObject::~ConsoleObject () { JS_FreeValue (this->m_engine.getContext (), this->m_instance); }
+\ No newline at end of file
++ConsoleObject::~ConsoleObject () { JS_FreeValue (this->m_engine.getContext (), this->m_instance); }
+diff --git a/src/WallpaperEngine/Scripting/ConsoleObject.h b/src/WallpaperEngine/Scripting/ConsoleObject.h
+index c329fda..e07be53 100644
+--- a/src/WallpaperEngine/Scripting/ConsoleObject.h
++++ b/src/WallpaperEngine/Scripting/ConsoleObject.h
+@@ -22,4 +22,4 @@ protected:
+     JSClassDef m_definition;
+     JSValue m_instance;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/EngineObject.cpp b/src/WallpaperEngine/Scripting/EngineObject.cpp
+index b8399fa..1589251 100644
+--- a/src/WallpaperEngine/Scripting/EngineObject.cpp
++++ b/src/WallpaperEngine/Scripting/EngineObject.cpp
+@@ -288,4 +288,4 @@ void EngineObject::tick () {
+     for (auto id : removeTimeouts) {
+ 	this->m_timeouts.erase (id);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/EngineObject.h b/src/WallpaperEngine/Scripting/EngineObject.h
+index 521a2ff..62a3bf6 100644
+--- a/src/WallpaperEngine/Scripting/EngineObject.h
++++ b/src/WallpaperEngine/Scripting/EngineObject.h
+@@ -44,4 +44,4 @@ protected:
+     JSClassDef m_definition;
+     JSValue m_instance;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/InputObject.cpp b/src/WallpaperEngine/Scripting/InputObject.cpp
+index 771d8c9..8b99e58 100644
+--- a/src/WallpaperEngine/Scripting/InputObject.cpp
++++ b/src/WallpaperEngine/Scripting/InputObject.cpp
+@@ -63,4 +63,4 @@ InputObject::InputObject (ScriptEngine& engine, Render::Wallpapers::CScene& scen
+ 	JS_NewCFunction (this->m_engine.getContext (), input_set_value, "set", 1), JS_PROP_ENUMERABLE
+     );
+ }
+-InputObject::~InputObject () { JS_FreeValue (this->m_engine.getContext (), this->m_instance); }
+\ No newline at end of file
++InputObject::~InputObject () { JS_FreeValue (this->m_engine.getContext (), this->m_instance); }
+diff --git a/src/WallpaperEngine/Scripting/InputObject.h b/src/WallpaperEngine/Scripting/InputObject.h
+index 83f7366..7f84ff4 100644
+--- a/src/WallpaperEngine/Scripting/InputObject.h
++++ b/src/WallpaperEngine/Scripting/InputObject.h
+@@ -22,4 +22,4 @@ protected:
+     JSClassDef m_definition;
+     JSValue m_instance;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Modules/ColorModule.cpp b/src/WallpaperEngine/Scripting/Modules/ColorModule.cpp
+index 09412df..1aa3f6c 100644
+--- a/src/WallpaperEngine/Scripting/Modules/ColorModule.cpp
++++ b/src/WallpaperEngine/Scripting/Modules/ColorModule.cpp
+@@ -263,4 +263,4 @@ ColorModule::ColorModule (ScriptEngine& engine) : ScriptModule (engine, "WEColor
+     colorModules.emplace (this->m_instanceId, *this);
+ }
+ 
+-ColorModule::~ColorModule () { colorModules.erase (this->m_instanceId); }
+\ No newline at end of file
++ColorModule::~ColorModule () { colorModules.erase (this->m_instanceId); }
+diff --git a/src/WallpaperEngine/Scripting/Modules/ColorModule.h b/src/WallpaperEngine/Scripting/Modules/ColorModule.h
+index 92e9e2c..59ec9b4 100644
+--- a/src/WallpaperEngine/Scripting/Modules/ColorModule.h
++++ b/src/WallpaperEngine/Scripting/Modules/ColorModule.h
+@@ -13,4 +13,4 @@ public:
+ protected:
+     uint32_t m_instanceId;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Modules/MathModule.cpp b/src/WallpaperEngine/Scripting/Modules/MathModule.cpp
+index b3f5a82..028edb3 100644
+--- a/src/WallpaperEngine/Scripting/Modules/MathModule.cpp
++++ b/src/WallpaperEngine/Scripting/Modules/MathModule.cpp
+@@ -91,4 +91,4 @@ MathModule::MathModule (ScriptEngine& engine) : ScriptModule (engine, "WEMath",
+     mathModules.emplace (this->m_instanceId, *this);
+ }
+ 
+-MathModule::~MathModule () { mathModules.erase (this->m_instanceId); }
+\ No newline at end of file
++MathModule::~MathModule () { mathModules.erase (this->m_instanceId); }
+diff --git a/src/WallpaperEngine/Scripting/Modules/MathModule.h b/src/WallpaperEngine/Scripting/Modules/MathModule.h
+index 11b8d86..5b12984 100644
+--- a/src/WallpaperEngine/Scripting/Modules/MathModule.h
++++ b/src/WallpaperEngine/Scripting/Modules/MathModule.h
+@@ -13,4 +13,4 @@ public:
+ protected:
+     uint32_t m_instanceId;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/Modules/ScriptModule.cpp b/src/WallpaperEngine/Scripting/Modules/ScriptModule.cpp
+index 5db3daa..372f600 100644
+--- a/src/WallpaperEngine/Scripting/Modules/ScriptModule.cpp
++++ b/src/WallpaperEngine/Scripting/Modules/ScriptModule.cpp
+@@ -9,4 +9,4 @@ ScriptModule::ScriptModule (ScriptEngine& engine, const std::string& name, JSMod
+     this->m_definition = JS_NewCModule (this->m_engine.getContext (), this->m_name.c_str (), init);
+ }
+ 
+-ScriptModule::~ScriptModule () { }
+\ No newline at end of file
++ScriptModule::~ScriptModule () { }
+diff --git a/src/WallpaperEngine/Scripting/Modules/ScriptModule.h b/src/WallpaperEngine/Scripting/Modules/ScriptModule.h
+index 96309ce..542e8fd 100644
+--- a/src/WallpaperEngine/Scripting/Modules/ScriptModule.h
++++ b/src/WallpaperEngine/Scripting/Modules/ScriptModule.h
+@@ -23,4 +23,4 @@ protected:
+     ScriptEngine& m_engine;
+     JSModuleDef* m_definition;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/SceneObject.cpp b/src/WallpaperEngine/Scripting/SceneObject.cpp
+index 8972ba0..d07c867 100644
+--- a/src/WallpaperEngine/Scripting/SceneObject.cpp
++++ b/src/WallpaperEngine/Scripting/SceneObject.cpp
+@@ -307,4 +307,4 @@ SceneObject::SceneObject (ScriptEngine& engine, Render::Wallpapers::CScene& scen
+     // TODO: ADD REST OF THE METHODS
+ }
+ 
+-SceneObject::~SceneObject () { JS_FreeValue (this->m_engine.getContext (), this->m_instance); }
+\ No newline at end of file
++SceneObject::~SceneObject () { JS_FreeValue (this->m_engine.getContext (), this->m_instance); }
+diff --git a/src/WallpaperEngine/Scripting/SceneObject.h b/src/WallpaperEngine/Scripting/SceneObject.h
+index 60ab9d6..d97a11a 100644
+--- a/src/WallpaperEngine/Scripting/SceneObject.h
++++ b/src/WallpaperEngine/Scripting/SceneObject.h
+@@ -23,4 +23,4 @@ private:
+     JSClassDef m_definition;
+     JSValue m_instance;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/ScriptEngine.cpp b/src/WallpaperEngine/Scripting/ScriptEngine.cpp
+index e690b92..52393c6 100644
+--- a/src/WallpaperEngine/Scripting/ScriptEngine.cpp
++++ b/src/WallpaperEngine/Scripting/ScriptEngine.cpp
+@@ -699,4 +699,4 @@ void ScriptEngine::notifyMediaUpdate (const Media::MediaSource::MediaInfo& media
+     JS_FreeValue (ctx, playbackEvent);
+     JS_FreeValue (ctx, mediaTimelineEvent);
+     JS_FreeValue (ctx, mediaThumbnailEvent);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/ScriptPropertiesObject.cpp b/src/WallpaperEngine/Scripting/ScriptPropertiesObject.cpp
+index f25e788..57c0e07 100644
+--- a/src/WallpaperEngine/Scripting/ScriptPropertiesObject.cpp
++++ b/src/WallpaperEngine/Scripting/ScriptPropertiesObject.cpp
+@@ -182,4 +182,4 @@ ScriptPropertiesObject::ScriptPropertiesObject (ScriptEngine& engine, Render::Wa
+ ScriptPropertiesObject::~ScriptPropertiesObject () {
+     JS_FreeValue (this->m_engine.getContext (), this->m_creatorPrototype);
+     JS_FreeValue (this->m_engine.getContext (), this->m_propertiesPrototype);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/ScriptPropertiesObject.h b/src/WallpaperEngine/Scripting/ScriptPropertiesObject.h
+index 0f80dce..101be29 100644
+--- a/src/WallpaperEngine/Scripting/ScriptPropertiesObject.h
++++ b/src/WallpaperEngine/Scripting/ScriptPropertiesObject.h
+@@ -33,4 +33,4 @@ protected:
+     JSValue m_propertiesPrototype;
+     JSClassExoticMethods m_exoticMethods;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Scripting/ScriptableObject.h b/src/WallpaperEngine/Scripting/ScriptableObject.h
+index 3d65893..f66f3eb 100644
+--- a/src/WallpaperEngine/Scripting/ScriptableObject.h
++++ b/src/WallpaperEngine/Scripting/ScriptableObject.h
+@@ -27,4 +27,4 @@ protected:
+ private:
+     std::map<std::string, PropertyEntry> m_properties;
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Testing/Cases/Example.cpp b/src/WallpaperEngine/Testing/Cases/Example.cpp
+index fc8b21d..e90674d 100644
+--- a/src/WallpaperEngine/Testing/Cases/Example.cpp
++++ b/src/WallpaperEngine/Testing/Cases/Example.cpp
+@@ -1,3 +1,3 @@
+ #include <catch2/catch_test_macros.hpp>
+ 
+-TEST_CASE ("Example test") { REQUIRE (true); }
+\ No newline at end of file
++TEST_CASE ("Example test") { REQUIRE (true); }
+diff --git a/src/WallpaperEngine/Testing/Cases/MouseCoordinates.cpp b/src/WallpaperEngine/Testing/Cases/MouseCoordinates.cpp
+index 1971efc..1a8ee5a 100644
+--- a/src/WallpaperEngine/Testing/Cases/MouseCoordinates.cpp
++++ b/src/WallpaperEngine/Testing/Cases/MouseCoordinates.cpp
+@@ -153,4 +153,4 @@ TEST_CASE ("Coordinate conversion with different viewport sizes") {
+ 	double openglY = static_cast<double> (height) - glfwY;
+ 	CHECK (openglY == 600.0);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Testing/Cases/PropertyParser.cpp b/src/WallpaperEngine/Testing/Cases/PropertyParser.cpp
+index c0bf921..ff0c1d5 100644
+--- a/src/WallpaperEngine/Testing/Cases/PropertyParser.cpp
++++ b/src/WallpaperEngine/Testing/Cases/PropertyParser.cpp
+@@ -30,4 +30,4 @@ TEST_CASE ("Directory properties are parsed as file-like properties") {
+ 
+     REQUIRE (property != nullptr);
+     CHECK (property->dump ().find ("folder - file") != std::string::npos);
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Testing/Harnesses/RenderHarness.cpp b/src/WallpaperEngine/Testing/Harnesses/RenderHarness.cpp
+index 9dec533..3ad3736 100644
+--- a/src/WallpaperEngine/Testing/Harnesses/RenderHarness.cpp
++++ b/src/WallpaperEngine/Testing/Harnesses/RenderHarness.cpp
+@@ -19,4 +19,4 @@ RenderHarness* RenderHarness::build (std::filesystem::path base) {
+     auto context = new ApplicationContext (1, const_cast<char**> (argv));
+ 
+     return new RenderHarness (context, new WallpaperApplication (*context));
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/Testing/Input/TestingMouseInput.cpp b/src/WallpaperEngine/Testing/Input/TestingMouseInput.cpp
+index ad94f41..88ed445 100644
+--- a/src/WallpaperEngine/Testing/Input/TestingMouseInput.cpp
++++ b/src/WallpaperEngine/Testing/Input/TestingMouseInput.cpp
+@@ -8,4 +8,4 @@ glm::dvec2 TestingMouseInput::position () const { return {}; }
+ 
+ MouseClickStatus TestingMouseInput::leftClick () const { return MouseClickStatus::Released; }
+ 
+-MouseClickStatus TestingMouseInput::rightClick () const { return MouseClickStatus::Released; }
+\ No newline at end of file
++MouseClickStatus TestingMouseInput::rightClick () const { return MouseClickStatus::Released; }
+diff --git a/src/WallpaperEngine/VideoPlayback/MPV/GLPlayer.cpp b/src/WallpaperEngine/VideoPlayback/MPV/GLPlayer.cpp
+index 39f1ff8..dad9d91 100644
+--- a/src/WallpaperEngine/VideoPlayback/MPV/GLPlayer.cpp
++++ b/src/WallpaperEngine/VideoPlayback/MPV/GLPlayer.cpp
+@@ -293,4 +293,4 @@ void GLPlayer::stop () {
+ 	mpv_terminate_destroy (this->m_handle);
+ 	this->m_handle = nullptr;
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/VideoPlayback/MPV/MemoryStreamProtocol.cpp b/src/WallpaperEngine/VideoPlayback/MPV/MemoryStreamProtocol.cpp
+index 0bca578..3784b2f 100644
+--- a/src/WallpaperEngine/VideoPlayback/MPV/MemoryStreamProtocol.cpp
++++ b/src/WallpaperEngine/VideoPlayback/MPV/MemoryStreamProtocol.cpp
+@@ -51,4 +51,4 @@ void MemoryStreamProtocol::registerReadCallback (mpv_handle* handle) {
+     if (mpv_stream_cb_add_ro (handle, "buffer", this, mem_open) < 0) {
+ 	sLog.exception ("Cannot register memory stream protocol for mpv");
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.cpp b/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.cpp
+index 93c82ed..5a2c95a 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.cpp
++++ b/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.cpp
+@@ -51,4 +51,4 @@ void BrowserApp::OnBeforeChildProcessLaunch (CefRefPtr<CefCommandLine> command_l
+     for (int i = 1; i < this->getApplication ().getContext ().getArgc (); i++) {
+ 	command_line->AppendArgument (this->getApplication ().getContext ().getArgv ()[i]);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.h b/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.h
+index d75bc60..911f5bc 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.h
++++ b/src/WallpaperEngine/WebBrowser/CEF/BrowserApp.h
+@@ -27,4 +27,4 @@ private:
+     IMPLEMENT_REFCOUNTING (BrowserApp);
+     DISALLOW_COPY_AND_ASSIGN (BrowserApp);
+ };
+-} // namespace WallpaperEngine::WebBrowser::CEF
+\ No newline at end of file
++} // namespace WallpaperEngine::WebBrowser::CEF
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.cpp b/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.cpp
+index 14618ce..5e8c3f7 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.cpp
++++ b/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.cpp
+@@ -4,4 +4,4 @@ using namespace WallpaperEngine::WebBrowser::CEF;
+ 
+ BrowserClient::BrowserClient (CefRefPtr<CefRenderHandler> ptr) : m_renderHandler (std::move (ptr)) { }
+ 
+-CefRefPtr<CefRenderHandler> BrowserClient::GetRenderHandler () { return m_renderHandler; }
+\ No newline at end of file
++CefRefPtr<CefRenderHandler> BrowserClient::GetRenderHandler () { return m_renderHandler; }
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.h b/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.h
+index 499bb73..98c1454 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.h
++++ b/src/WallpaperEngine/WebBrowser/CEF/BrowserClient.h
+@@ -17,4 +17,4 @@ public:
+ 
+     IMPLEMENT_REFCOUNTING (BrowserClient);
+ };
+-} // namespace WallpaperEngine::WebBrowser::CEF
+\ No newline at end of file
++} // namespace WallpaperEngine::WebBrowser::CEF
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.cpp b/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.cpp
+index fc31baa..9ed70da 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.cpp
++++ b/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.cpp
+@@ -24,4 +24,4 @@ int RenderHandler::getWidth () const { return this->m_webdata->getWidth (); }
+ 
+ int RenderHandler::getHeight () const { return this->m_webdata->getHeight (); }
+ 
+-GLuint RenderHandler::texture () const { return this->m_webdata->getWallpaperFramebuffer (); }
+\ No newline at end of file
++GLuint RenderHandler::texture () const { return this->m_webdata->getWallpaperFramebuffer (); }
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.h b/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.h
+index a9315ba..a7ba2c4 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.h
++++ b/src/WallpaperEngine/WebBrowser/CEF/RenderHandler.h
+@@ -40,4 +40,4 @@ private:
+     //! \brief Return the OpenGL texture handle
+     [[nodiscard]] GLuint texture () const;
+ };
+-} // namespace WallpaperEngine::WebBrowser::CEF
+\ No newline at end of file
++} // namespace WallpaperEngine::WebBrowser::CEF
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.cpp b/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.cpp
+index 7b10769..3af36b9 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.cpp
++++ b/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.cpp
+@@ -27,4 +27,4 @@ const WallpaperEngine::Application::WallpaperApplication& SubprocessApp::getAppl
+ 
+ const std::map<std::string, WPSchemeHandlerFactory*>& SubprocessApp::getHandlerFactories () const {
+     return this->m_handlerFactories;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.h b/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.h
+index 532f1f4..47e96cd 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.h
++++ b/src/WallpaperEngine/WebBrowser/CEF/SubprocessApp.h
+@@ -25,4 +25,4 @@ private:
+     IMPLEMENT_REFCOUNTING (SubprocessApp);
+     DISALLOW_COPY_AND_ASSIGN (SubprocessApp);
+ };
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.cpp b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.cpp
+index 8f29be8..78ff201 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.cpp
++++ b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.cpp
+@@ -96,4 +96,4 @@ bool WPSchemeHandler::Read (
+     bytes_read = this->m_contents->gcount ();
+ 
+     return true;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.h b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.h
+index b71061d..8bd4655 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.h
++++ b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandler.h
+@@ -43,4 +43,4 @@ private:
+     IMPLEMENT_REFCOUNTING (WPSchemeHandler);
+     DISALLOW_COPY_AND_ASSIGN (WPSchemeHandler);
+ };
+-};
+\ No newline at end of file
++};
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.cpp b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.cpp
+index 34b1565..b2ee5d2 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.cpp
++++ b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.cpp
+@@ -17,4 +17,4 @@ CefRefPtr<CefResourceHandler> WPSchemeHandlerFactory::Create (
+ 
+ std::string WPSchemeHandlerFactory::generateSchemeName (const std::string& workshopId) {
+     return std::string (WPENGINE_SCHEME) + workshopId;
+-}
+\ No newline at end of file
++}
+diff --git a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.h b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.h
+index 6de268b..23670ed 100644
+--- a/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.h
++++ b/src/WallpaperEngine/WebBrowser/CEF/WPSchemeHandlerFactory.h
+@@ -30,4 +30,4 @@ private:
+     IMPLEMENT_REFCOUNTING (WPSchemeHandlerFactory);
+     DISALLOW_COPY_AND_ASSIGN (WPSchemeHandlerFactory);
+ };
+-} // namespace WallpaperEngine::WebBrowser::CEF
+\ No newline at end of file
++} // namespace WallpaperEngine::WebBrowser::CEF
+diff --git a/src/main.cpp b/src/main.cpp
+index 908ab69..99c41d1 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -75,4 +75,4 @@ int main (int argc, char* argv[]) {
+ 	std::cerr << e.what () << std::endl;
+ 	return 1;
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/recording.cpp b/src/recording.cpp
+index c49ef69..ea87726 100644
+--- a/src/recording.cpp
++++ b/src/recording.cpp
+@@ -195,4 +195,4 @@ int close_encoder () {
+     return 0;
+ }
+ 
+-#endif /* DEMOMODE */
+\ No newline at end of file
++#endif /* DEMOMODE */
+diff --git a/src/recording.h b/src/recording.h
+index 3eb5ec3..1b7f1cc 100644
+--- a/src/recording.h
++++ b/src/recording.h
+@@ -13,4 +13,4 @@ int init_encoder (const char* output_file, int sourceWidth, int sourceHeight);
+ int write_video_frame (const uint8_t* rgb_data);
+ int close_encoder ();
+ 
+-#endif /* DEMOMODE */
+\ No newline at end of file
++#endif /* DEMOMODE */
